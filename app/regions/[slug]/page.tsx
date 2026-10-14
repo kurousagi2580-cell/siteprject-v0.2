@@ -1,16 +1,15 @@
 import Link from "next/link"
 import { notFound } from "next/navigation"
 import { FileText } from "lucide-react"
-import { SiteShell } from "@/components/site-shell"
-import { CommentSection } from "@/components/section/comment-section"
+import { SiteShell } from "@/components/layout/site-shell"
+import CommentSection from "@/components/section/comment-section";
 import { CardBox } from "@/components/ui/card-box"
 import { CardPanel } from "@/components/ui/card-panel"
 import { GameSectionTitle } from "@/components/ui/game-section-title"
 import { Section } from "@/components/ui/section"
-import { fetchData } from "@/lib/supabase/queries"
-import type { RegionJoinLocation } from "@/types/region"
-import type { Page } from "@/types/page"
-import { getComments } from "@/lib/comments"
+import { getPageBySlug } from "@/actions/pages-actions-server"
+import { getRegionBySlug } from "@/lib/supabase/queries/regions"
+
 
 // ローカルデータ（変更しない）
 import { mapEnemies, mapDrops, mapRoute, pages } from "@/lib/data"
@@ -22,39 +21,14 @@ export default async function MapDetailPage({
 }) {
   const { slug } = await params
 
-  const page = await fetchData<Page>("pages", {
-    select: "id, slug, title",
-    filters: [{ column: "slug", operator: "eq", value: slug }],
-    single: true,
-  })
+  const page = await getPageBySlug(slug);
 
-  if (!page) notFound()
-
-  const comments = await getComments(page.id)
+if (!page) notFound();
 
   // ▼▼▼ DB からマップを取得 ▼▼▼
-  const map = await fetchData<RegionJoinLocation>("regions", {
-    select: `
-      id,
-      name,
-      short_name,
-      image_url,
-      description,
-      map_x,
-      map_y,
-      locations:locations!locations_parent_region_id_fkey (
-        id,
-        name,
-        fast_travel,
-        x,
-        y
-      )
-    `,
-    filters: [{ column: "slug", operator: "eq", value: slug }],
-    single: true,
-  })
+  const region = await getRegionBySlug(slug);
 
-  if (!map) notFound()
+  if (!region) notFound();
 
   const relatedPages = pages.slice(0, 3)
 
@@ -73,8 +47,8 @@ export default async function MapDetailPage({
       {/* Eyecatch */}
       <CardBox className="h-52 md:h-72 flex items-center justify-center">
         <img
-          src={map.image_url || "/noimage.png"}
-          alt={map.name}
+          src={region.image_url || "/noimage.png"}
+          alt={region.name}
           className="w-full object-cover rounded-sm"
         />
       </CardBox>
@@ -88,7 +62,7 @@ export default async function MapDetailPage({
 
         <CardPanel>
           <p className="whitespace-pre-line text-sm text-ananta-text">
-            {map.description}
+            {region.description}
           </p>
         </CardPanel>
       </Section>
@@ -205,7 +179,7 @@ export default async function MapDetailPage({
 
       {/* ▼▼▼ コメント ▼▼▼ */}
       <Section id="comments">
-        <CommentSection comments={comments} pageId={page.id}/>
+        <CommentSection pageId={page.id} />
       </Section>
 
     </SiteShell>

@@ -1,8 +1,12 @@
 
-import { getCountries } from "@/lib/supabase/get-countries"
-import RegionForm from "@/components/admin/region-form"
+
+import RegionForm from "@/components/entities/region/region-form"
+import { getCountryList } from "@/actions/countries-actions-server";
 
 export default async function Page() {
-  const countries = await getCountries()
-  return <RegionForm mode= "create" countries={countries} />
+
+  const cotRes = await getCountryList();
+  const countries = cotRes?.items ?? []
+
+  return <RegionForm mode="create" countries={countries} />
 }

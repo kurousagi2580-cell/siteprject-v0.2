@@ -1,28 +1,19 @@
 
-import { SiteShell } from "@/components/site-shell"
+import { SiteShell } from "@/components/layout/site-shell"
 import { Surface } from "@/components/ui/surface"
 import { GameSectionTitle } from "@/components/ui/game-section-title"
 import { LinkCardBox } from "@/components/ui/link-card-box"
 import { Section } from "@/components/ui/section"
-import { fetchData } from "@/lib/supabase/queries"
-import type { CountryJoinRegion } from "@/types/country"
+import { listCountries } from "@/lib/supabase/queries/contries"
 import { ASPECT } from "@/lib/image-aspect"
 
 
 export default async function CountryListPage() {
 
-  const countries = await fetchData<CountryJoinRegion>(
-      "countries",
-      {
-        select: `id, name, short_name, image_url, description, slug`,
-      }
-    ) 
-
+  const countries = (await listCountries()).items
   
-
   return (
     <SiteShell>
-      
 
         {/* アイキャッチ */}
         <Surface

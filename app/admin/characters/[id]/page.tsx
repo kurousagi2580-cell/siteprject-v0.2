@@ -1,24 +1,18 @@
-import CharacterForm from "@/components/admin/character-form"
-import type { Character } from "@/types/character"
-import { fetchData } from "@/lib/supabase/queries"
-import { getAffiliations } from "@/lib/supabase/get-affiliations"
+
+import CharacterForm from "@/components/entities/character/character-form"
+import { getCharacterById } from "@/actions/characters-actions-server";
+import { getAffiliationList } from "@/actions/affiliations-actions-server";
 
 export default async function Page({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params
 
-  const character = await fetchData<Character>("characters", {
-      select: "id, name, short_name, image_url, type, spaction, profile, affiliation_id, slug",
-      filters: [{ column: "id", operator: "eq", value: id }],
-      single:true
-    })
+  const affRes = await getAffiliationList();
+  const affiliations = affRes?.items ?? []
 
-  const affiliations = await getAffiliations()
-  
-  console.log(character)
+  const character = await getCharacterById(id);
+  if (!character) return null;
 
-  if (!character) {
-    return null
-  }
+  const safe = { ...character, created_at: character.created_at?.toString?.(), updated_at: character.updated_at?.toString?.() };
 
-  return <CharacterForm mode="edit" initialData={character} affiliations={affiliations}/>
+  return <CharacterForm mode="edit" initialData={safe} affiliations={affiliations} />
 }

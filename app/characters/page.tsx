@@ -1,42 +1,19 @@
-import { SiteShell } from "@/components/site-shell"
+import { SiteShell } from "@/components/layout/site-shell"
 import { Surface } from "@/components/ui/surface"
 import { UpdateLogSection } from "@/components/update-log-section"
-import { CharacterSearchSection } from "./CharacterSearchSection"
-import { fetchData } from "@/lib/supabase/queries"
-import { getUpdateLogs } from "@/lib/supabase/get-updatelogs"
-import type { CharacterDetaill } from "@/types/character"
-
+import { CharacterSearchSection } from "@/components/character/character-seach-section"
+import { getCharacterJoinAffiliation } from "@/lib/supabase/queries/characters"
+import { getUpdateLogListByType } from "@/actions/updatelogs-actions-server"
+import { notFound } from "next/navigation"
 
 export default async function CharacterListPage() {
 
-  const characters = await fetchData<CharacterDetaill>(
-    "characters",
-    {
-      select: `
-        id,
-        name,
-        short_name,
-        type,
-        image_url,
-        profile,
-        slug,
-        affiliation:affiliation_id (
-          id,
-          name,
-          icon_url,
-          description,
-          category,
-          order,
-          parent_affiliation_id
-        )
-      `,
-      filters: [
-        { column: "type", operator: "eq", value: "プレイアブル" }
-      ],
-    }
-  )
+const type = "character"
+const characters = await getCharacterJoinAffiliation();
 
-  const updates = await getUpdateLogs("character")
+if (!characters) notFound();
+
+  const updates = (await getUpdateLogListByType(type)).items ?? []
 
   return (
     <SiteShell>

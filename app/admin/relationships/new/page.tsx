@@ -1,13 +1,12 @@
 
-import { getCharacters } from "@/lib/supabase/get-characters"
-import RelationShipsForm from "@/components/admin/relationship-form"
-
+import RelationshipForm from "@/components/entities/relationship/relationship-form-wrapper"
+import { getCharacterByList } from "@/actions/characters-actions-server";
 
 export default async function Page() {
- const characters = await getCharacters()
 
-  if (!characters) {
-    return null
-  }
-  return <RelationShipsForm mode="create" characters={characters} />
+  const charaRes = await getCharacterByList();
+  const characters = charaRes?.items ?? []
+
+  return <RelationshipForm mode="create" characters={characters} />
 }
+

@@ -1,7 +1,9 @@
-import ArticleForm from "@/components/admin/article-form"
-import { getPages } from "@/lib/supabase/get-pages"
+
+
+import ArticleForm from "@/components/entities/article/article-form";
+import { getPageList } from "@/actions/pages-actions-server";
 
 export default async function Page() {
-  const pageData = await getPages() ?? []
-  return <ArticleForm mode= "create" pageData={pageData}/>
+  const pageData = await getPageList() ?? [];
+  return <ArticleForm mode="create" pageData={pageData} />;
 }

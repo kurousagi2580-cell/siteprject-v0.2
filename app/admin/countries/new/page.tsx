@@ -1,6 +1,4 @@
-
-import CountryForm from "@/components/admin/country-form"
-
+import CountryForm from "@/components/entities/country/country-form"
 
 export default async function Page() {
   return <CountryForm mode= "create" />

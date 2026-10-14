@@ -2,7 +2,7 @@
 import { CardPanel } from "@/components/ui/card-panel"
 import { GameSectionTitle } from "@/components/ui/game-section-title"
 import { Section } from "@/components/ui/section"
-import { SiteShell } from "@/components/site-shell"
+import { SiteShell } from "@/components/layout/site-shell"
 import { Surface } from "@/components/ui/surface"
 
 export default function NoticesPage() {

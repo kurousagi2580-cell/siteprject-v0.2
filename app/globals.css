@@ -4,6 +4,7 @@
 
 @custom-variant dark (&:is(.dark *));
 
+/* Map shadcn tokens to ananta tokens and expose ananta tokens for components */
 @theme inline {
   --color-sidebar-ring: var(--sidebar-ring);
   --color-sidebar-border: var(--sidebar-border);
@@ -43,6 +44,8 @@
   --radius-2xl: calc(var(--radius) * 1.8);
   --radius-3xl: calc(var(--radius) * 2.2);
   --radius-4xl: calc(var(--radius) * 2.6);
+
+  /* Expose ananta tokens for convenience */
   --color-ananta-bg: var(--ananta-bg);
   --color-ananta-surface: var(--ananta-surface);
   --color-ananta-surface2: var(--ananta-surface2);
@@ -53,41 +56,9 @@
   --color-ananta-border: var(--ananta-border);
 }
 
+/* ANANTA base tokens and mapping to shadcn tokens */
 :root {
-  color-scheme: light;
-  --background: oklch(1 0 0);
-  --foreground: oklch(0.145 0 0);
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.145 0 0);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.145 0 0);
-  --primary: oklch(0.205 0 0);
-  --primary-foreground: oklch(0.985 0 0);
-  --secondary: oklch(0.97 0 0);
-  --secondary-foreground: oklch(0.205 0 0);
-  --muted: oklch(0.97 0 0);
-  --muted-foreground: oklch(0.556 0 0);
-  --accent: oklch(0.97 0 0);
-  --accent-foreground: oklch(0.205 0 0);
-  --destructive: oklch(0.577 0.245 27.325);
-  --border: oklch(0.922 0 0);
-  --input: oklch(0.922 0 0);
-  --ring: oklch(0.708 0 0);
-  --chart-1: oklch(0.87 0 0);
-  --chart-2: oklch(0.556 0 0);
-  --chart-3: oklch(0.439 0 0);
-  --chart-4: oklch(0.371 0 0);
-  --chart-5: oklch(0.269 0 0);
-  --radius: 0.625rem;
-  --sidebar: oklch(0.985 0 0);
-  --sidebar-foreground: oklch(0.145 0 0);
-  --sidebar-primary: oklch(0.205 0 0);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.97 0 0);
-  --sidebar-accent-foreground: oklch(0.205 0 0);
-  --sidebar-border: oklch(0.922 0 0);
-  --sidebar-ring: oklch(0.708 0 0);
-  /* ANANTA カラー */
+  /* ANANTA core */
   --ananta-bg: #0D1117;
   --ananta-surface: #151B23;
   --ananta-surface2: #1B222C;
@@ -96,93 +67,146 @@
   --ananta-accent: #B9FF3D;
   --ananta-link: #5ED8FF;
   --ananta-border: rgba(255,255,255,.12);
-}
+  --radius: 0.625rem;
 
-/* スライドショーのトラック */
-.slider-track {
-  display: flex;
-  transition: transform 0.3s ease;
-}
+  /* Map shadcn / generic tokens to ananta tokens for consistency */
+  --background: var(--ananta-bg);
+  --foreground: var(--ananta-text);
+  --card: var(--ananta-surface);
+  --card-foreground: var(--ananta-text);
+  --popover: var(--ananta-surface2);
+  --popover-foreground: var(--ananta-text);
+  --primary: var(--ananta-accent);
+  --primary-foreground: #0D1117;
+  --secondary: var(--ananta-surface2);
+  --secondary-foreground: var(--ananta-text);
+  --muted: var(--ananta-muted);
+  --muted-foreground: var(--ananta-muted);
+  --accent: var(--ananta-accent);
+  --accent-foreground: var(--ananta-text);
+  --destructive: oklch(0.577 0.245 27.325);
+  --border: var(--ananta-border);
+  --input: color-mix(in oklab, var(--ananta-surface) 85%, transparent);
+  --ring: oklch(0.708 0 0);
 
-.dark {
-  color-scheme: dark;
-  --background: oklch(0.145 0 0);
-  --foreground: oklch(0.985 0 0);
-  --card: oklch(0.205 0 0);
-  --card-foreground: oklch(0.985 0 0);
-  --popover: oklch(0.205 0 0);
-  --popover-foreground: oklch(0.985 0 0);
-  --primary: oklch(0.922 0 0);
-  --primary-foreground: oklch(0.205 0 0);
-  --secondary: oklch(0.269 0 0);
-  --secondary-foreground: oklch(0.985 0 0);
-  --muted: oklch(0.269 0 0);
-  --muted-foreground: oklch(0.708 0 0);
-  --accent: oklch(0.269 0 0);
-  --accent-foreground: oklch(0.985 0 0);
-  --destructive: oklch(0.704 0.191 22.216);
-  --border: oklch(1 0 0 / 10%);
-  --input: oklch(1 0 0 / 15%);
-  --ring: oklch(0.556 0 0);
+  /* Chart and sidebar tokens (kept for compatibility) */
   --chart-1: oklch(0.87 0 0);
   --chart-2: oklch(0.556 0 0);
   --chart-3: oklch(0.439 0 0);
   --chart-4: oklch(0.371 0 0);
   --chart-5: oklch(0.269 0 0);
-  --sidebar: oklch(0.205 0 0);
-  --sidebar-foreground: oklch(0.985 0 0);
-  --sidebar-primary: oklch(0.488 0.243 264.376);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.269 0 0);
-  --sidebar-accent-foreground: oklch(0.985 0 0);
-  --sidebar-border: oklch(1 0 0 / 10%);
-  --sidebar-ring: oklch(0.556 0 0);
+
+  --sidebar: var(--ananta-surface);
+  --sidebar-foreground: var(--ananta-text);
+  --sidebar-primary: var(--ananta-accent);
+  --sidebar-primary-foreground: var(--ananta-text);
+  --sidebar-accent: var(--ananta-accent);
+  --sidebar-accent-foreground: var(--ananta-text);
+  --sidebar-border: var(--ananta-border);
+  --sidebar-ring: var(--ring);
+
+  /* Ensure color-scheme is declared */
+  color-scheme: dark;
 }
 
+/* Dark class for explicit control (use html.class="dark" to force dark) */
+.dark {
+  /* Keep values mapped to ananta tokens; override only if needed */
+  --background: var(--ananta-bg);
+  --foreground: var(--ananta-text);
+  --card: var(--ananta-surface);
+  --card-foreground: var(--ananta-text);
+  --popover: var(--ananta-surface2);
+  --popover-foreground: var(--ananta-text);
+  --primary: var(--ananta-accent);
+  --primary-foreground: #0D1117;
+  --secondary: var(--ananta-surface2);
+  --secondary-foreground: var(--ananta-text);
+  --muted: var(--ananta-muted);
+  --muted-foreground: var(--ananta-muted);
+  --accent: var(--ananta-accent);
+  --accent-foreground: var(--ananta-text);
+  --border: var(--ananta-border);
+  --input: color-mix(in oklab, var(--ananta-surface) 85%, transparent);
+  --ring: oklch(0.708 0 0);
+  color-scheme: dark;
+}
+
+/* If you want to respect user preference instead of forcing dark, remove the .dark-only approach above
+   and enable the following media block. If site is dark-fixed, you can safely remove this block. */
+/* (Removed to avoid duplication when dark is forced via html.class="dark") */
+/*
 @media (prefers-color-scheme: dark) {
   :root:not(.light) {
-    color-scheme: dark;
-    --background: oklch(0.145 0 0);
-    --foreground: oklch(0.985 0 0);
-    --card: oklch(0.205 0 0);
-    --card-foreground: oklch(0.985 0 0);
-    --popover: oklch(0.205 0 0);
-    --popover-foreground: oklch(0.985 0 0);
-    --primary: oklch(0.922 0 0);
-    --primary-foreground: oklch(0.205 0 0);
-    --secondary: oklch(0.269 0 0);
-    --secondary-foreground: oklch(0.985 0 0);
-    --muted: oklch(0.269 0 0);
-    --muted-foreground: oklch(0.708 0 0);
-    --accent: oklch(0.269 0 0);
-    --accent-foreground: oklch(0.985 0 0);
-    --destructive: oklch(0.704 0.191 22.216);
-    --border: oklch(1 0 0 / 10%);
-    --input: oklch(1 0 0 / 15%);
-    --ring: oklch(0.556 0 0);
-    --chart-1: oklch(0.87 0 0);
-    --chart-2: oklch(0.556 0 0);
-    --chart-3: oklch(0.439 0 0);
-    --chart-4: oklch(0.371 0 0);
-    --chart-5: oklch(0.269 0 0);
-    --sidebar: oklch(0.205 0 0);
-    --sidebar-foreground: oklch(0.985 0 0);
-    --sidebar-primary: oklch(0.488 0.243 264.376);
-    --sidebar-primary-foreground: oklch(0.985 0 0);
-    --sidebar-accent: oklch(0.269 0 0);
-    --sidebar-accent-foreground: oklch(0.985 0 0);
-    --sidebar-border: oklch(1 0 0 / 10%);
-    --sidebar-ring: oklch(0.556 0 0);
+    --background: var(--ananta-bg);
+    --foreground: var(--ananta-text);
+    ...
+  }
+}
+*/
+
+/* Slider track utility */
+.slider-track {
+  display: flex;
+  transition: transform 0.3s ease;
+}
+
+/* Tailwind utilities and components consolidation */
+@layer utilities {
+  /* Glass card utility used by Surface / Card components */
+  .glass {
+    background: color-mix(in oklab, var(--ananta-surface) 50%, transparent);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid var(--ananta-border);
+    box-shadow: inset 0 0 20px rgb(0 0 0 / .5);
+  }
+
+  /* Optional: small shadow utility for raised elements */
+  .ananta-shadow-sm {
+    box-shadow: 0 1px 2px rgba(0,0,0,0.4);
   }
 }
 
+/* Base layer: normalize common element defaults */
 @layer base {
+  /* Apply border color and focus ring defaults */
   * {
-    @apply border-border outline-ring/50;
+    @apply border-border outline-none;
   }
+
+  /* Body defaults: use foreground token and transparent background to allow layout backgrounds */
   body {
     @apply text-foreground;
     background-color: transparent;
+    margin: 0;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  /* Prose image defaults: centralize image styling used across articles */
+  .prose img {
+    max-width: 100%;
+    height: auto;
+    object-fit: cover;
+    border-radius: 0.375rem;
+  }
+
+  /* Ensure links use ananta link color */
+  a {
+    color: var(--ananta-link);
+    text-decoration: underline;
   }
 }
 
+/* Example Surface component usage classes (kept for reference) */
+/* Use these classes in JSX: <div class="rounded-sm glass p-4"> ... </div> */
+/* Or for default surface: <div class="rounded-sm bg-ananta-surface p-3"> ... </div> */
+
+/* Fixes for common typos and invalid classes:
+   - Replace occurrences of `grid-cols2` with `grid-cols-2`
+   - Replace `border-ananta-border/500` with `border border-ananta-border` or `border` + custom color utility
+   - Remove any CSS comments inside JSX className strings
+*/
+
+/* End of stylesheet */

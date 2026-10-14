@@ -3,14 +3,14 @@ import { CardPanel } from "@/components/ui/card-panel"
 import { GameSectionTitle } from "@/components/ui/game-section-title"
 import { Section } from "@/components/ui/section"
 import { Surface } from "@/components/ui/surface"
-import { SiteShell } from "@/components/site-shell"
-import { getGameEvents } from "@/lib/gameevents"
+import { SiteShell } from "@/components/layout/site-shell"
+import { getEventList } from "@/actions/events-actions-server"
 import { buildEntityUrl } from "@/lib/utils/url-utils"
 import Link from "next/link"
 
 export default async function EventsPage() {
 
-    const events = await getGameEvents()
+    const events = (await getEventList()).items
 
     const now = new Date()
 
@@ -25,7 +25,6 @@ export default async function EventsPage() {
           ev.end_date !== null &&
           new Date(ev.end_date) >= now)
     )
-
 
     return (
         <SiteShell>
@@ -50,7 +49,7 @@ export default async function EventsPage() {
                                         <div className="flex items-center gap-2">
                                             {/* 画像 */}
                                             <img
-                                                src={ev.image_url ?? "/noimage.png"}
+                                                src={ev.image_url || "/noimage.png"}
                                                 alt={ev.title}
                                                 className="wsize-4 shrink-0 text-ananta-muted object-cover rounded-sm"
                                             />
@@ -86,7 +85,7 @@ export default async function EventsPage() {
                                         <div className="flex items-center gap-2">
                                             {/* 画像 */}
                                             <img
-                                                src={ev.image_url ?? "/noimage.png"}
+                                                src={ev.image_url || "/noimage.png"}
                                                 alt={ev.title}
                                                 className="wsize-4 shrink-0 text-ananta-muted object-cover rounded-sm"
                                             />

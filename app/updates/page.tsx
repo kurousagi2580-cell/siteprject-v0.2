@@ -2,13 +2,14 @@
 import { CardPanel } from "@/components/ui/card-panel"
 import { GameSectionTitle } from "@/components/ui/game-section-title"
 import { Section } from "@/components/ui/section"
-import { SiteShell } from "@/components/site-shell"
+import { SiteShell } from "@/components/layout/site-shell"
 import { Surface } from "@/components/ui/surface"
-import { getUpdates } from "@/lib/supabase/get-updates"
+import { makeCrudActions } from "@/actions/make-crud-actions"
 import { ExternalLink } from "@/components/external-link"
+import type { Update } from "@/types/update"
 
 export default async function UpdatesPage() {
-    const updates = await getUpdates()
+    const updates = await (await makeCrudActions<Update>("updates","id").list()).items
 
     return (
         <SiteShell>

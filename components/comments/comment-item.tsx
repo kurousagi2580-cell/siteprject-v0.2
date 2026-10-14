@@ -1,7 +1,7 @@
 import { CheckSquare } from "lucide-react"
 import type { Comment } from "@/types/comment"
 import { CardPanel } from "@/components/ui/card-panel"
-import { toDateTimeString } from "@/lib/utils/toDateTimeString"
+import { toDateTimeString } from "@/lib/utils/toDate"
 
 export function CommentItem({
   comment,

@@ -1,27 +1,27 @@
 import Link from "next/link"
 import { FileText, MessageSquare } from "lucide-react"
-import { SiteShell } from "@/components/site-shell"
+import { SiteShell } from "@/components/layout/site-shell"
 import { pages } from "@/lib/data"
-import { getLatestComments } from "@/lib/supabase/get-ltcomments"
 import { LinkCardBox } from "@/components/ui/link-card-box"
 import { CardPanel } from "@/components/ui/card-panel"
 import { Surface } from "@/components/ui/surface"
 import { GameSectionTitle } from "@/components/ui/game-section-title"
 import { Section } from "@/components/ui/section"
-import { fetchData } from "@/lib/supabase/queries"
-import type { CharacterDetaill } from "@/types/character"
-import type { CountryJoinRegion } from "@/types/country"
-import { CharacterGrid } from "./characters/CharacterGrid"
+import { getLatestComments } from "@/lib/supabase/queries/comments"
+import { getCharacterByList } from "@/actions/characters-actions-server"
+import { getCountryList } from "@/actions/countries-actions-server"
+import { CharacterGrid } from "../components/character/character-grid"
 import { ASPECT } from "@/lib/image-aspect"
 import { resolvePageUrl } from "@/lib/utils/url-utils"
-import { toDateTimeString } from "@/lib/utils/toDateTimeString"
+import { toDateTimeString } from "@/lib/utils/toDate"
+
 
 export default async function TopPage() {
   const recommendedPages = pages.filter((p) => p.type === "recommend")
 
   // ▼▼▼ DB から取得 ▼▼▼
 
-  const comments = await getLatestComments()
+  const comments = await getLatestComments() ?? []
 
   // ページごとに最新コメント1件だけ抽出
   const latestByPage = new Map()
@@ -32,31 +32,9 @@ export default async function TopPage() {
   }
   const latestComments = Array.from(latestByPage.values()).slice(0, 5)
 
-  const characters = await fetchData<CharacterDetaill>("characters", {
-    select: `
-      id,
-      name,
-      short_name,
-      image_url,
-      slug,
-      created_at
-    `,
-    order: [{ column: "created_at", ascending: false }],
-    limit: 6
-  })
+  const characters = (await getCharacterByList()).items;
 
-  const countries = await fetchData<CountryJoinRegion>("countries", {
-    select: `
-        id,
-        name,
-        short_name,
-        image_url,
-        slug,
-        created_at
-      `,
-    order: [{ column: "created_at", ascending: false }],
-    limit: 4
-  })
+  const countries = (await getCountryList()).items;
 
   return (
     <SiteShell rightNavMode="none">

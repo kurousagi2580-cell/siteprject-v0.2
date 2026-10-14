@@ -4,15 +4,13 @@ import { CategoryPanel } from "./category-panel"
 import { LinkCardBox } from "../ui/link-card-box"
 import { CardPanel } from "../ui/card-panel"
 import type { ReactNode } from "react"
+import type { SearchTabKey } from "@/types/utils/tab";
 
 import type { Character } from "@/types/character"
 import type { Affiliation } from "@/types/affiliation"
 import type { Country } from "@/types/country"
 import type { Region } from "@/types/region"
 import type { GameEvent } from "@/types/gameevents"
-
-
-type TabKey = "all" | "characters" | "affiliations" | "countries" | "regions" | "events"
 
 type SearchSection = {
     title: string
@@ -21,7 +19,7 @@ type SearchSection = {
 }
 
 type SearchResultsProps = {
-    tab: TabKey
+    tab: SearchTabKey
     page: number
     PAGE_SIZE: number
     keyword: string

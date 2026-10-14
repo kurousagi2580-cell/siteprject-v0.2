@@ -3,7 +3,7 @@
 import { useState } from "react"
 import Link from "next/link"
 
-interface Marker {
+export interface Marker {
   slug: string
   name: string
   x: number | null

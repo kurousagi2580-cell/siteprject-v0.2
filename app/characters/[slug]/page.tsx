@@ -1,21 +1,16 @@
 
 import { notFound } from "next/navigation"
-import { SiteShell } from "@/components/site-shell"
-import { CommentSection } from "@/components/section/comment-section"
+import { SiteShell } from "@/components/layout/site-shell"
+import CommentSection from "@/components/section/comment-section"
 import { Surface } from "@/components/ui/surface"
-import { createSupabaseServerClient } from "@/lib/supabase/client"
-import { fetchData } from "@/lib/supabase/queries"
-import type { Page } from "@/types/page"
-import { getComments } from "@/lib/comments"
-import { getCharacterDetail } from "@/lib/supabase/get-characters-detail"
-import { getRelatedArticles } from "@/lib/supabase/get-related-articles"
+import { getPageBySlug } from "@/actions/pages-actions-server"
+import { getArticleListByPage } from "@/actions/articles-actions-server"
+import { getCharacterDetail } from "@/lib/supabase/queries/characters"
 import { mergeRelations } from "@/lib/characters/merg-character-relation"
 import { ProfileSection } from "@/components/section/profile-section"
 import { SkillsSection } from "@/components/section/skills-section"
 import { RelationsSection } from "@/components/section/relations-section"
 import { RelatedArticlesSection } from "@/components/section/related-articles-section"
-
-const supabase = createSupabaseServerClient()
 
 export default async function CharacterDetailPage({
   params,
@@ -24,54 +19,50 @@ export default async function CharacterDetailPage({
 }) {
   const { slug } = await params
 
-  const page = await fetchData<Page>("pages", {
-    select: "id, slug, title",
-    filters: [{ column: "slug", operator: "eq", value: slug }],
-    single: true,
-  })
+  try {
+    const page = await getPageBySlug(slug)
 
-  if (!page) notFound()
+    if (!page) notFound()
 
-  //console.log("page id："+ page.id)
+    const relatedArticle = (await getArticleListByPage(page.id)).items
 
-  const relatedArticle = await getRelatedArticles(page.id)
-  //console.log("関連記事"+ relatedArticle[0].id)
+    const character = await getCharacterDetail(slug)
 
-  const comments = await getComments(page.id)
-  //console.log("コメント："+ comments[0].id)
+    if (!character || null) notFound()
 
-  const character = await getCharacterDetail(slug)
+    const relations = mergeRelations(character)
 
-  if (!character || null) notFound()
+    const pageNavItems = [
+      { label: "基本情報", href: "#overview" },
+      { label: "スキル", href: "#skills" },
+      { label: "関連人物", href: "#relations" },
+      { label: "関連記事", href: "#related-articles" },
+      { label: "コメント", href: "#comments" },
+    ]
 
-  const relations = mergeRelations(character)
+    return (
+      <SiteShell pageNavItems={pageNavItems}>
 
+        {/* アイキャッチ */}
+        <Surface
+          variant="raised"
+          className="h-40 md:h-52 flex items-center justify-center"
+        >
+          アイキャッチ画像
+        </Surface>
 
-  const pageNavItems = [
-    { label: "基本情報", href: "#overview" },
-    { label: "スキル", href: "#skills" },
-    { label: "関連人物", href: "#relations" },
-    { label: "関連記事", href: "#related-articles" },
-    { label: "コメント", href: "#comments" },
-  ]
+        <ProfileSection character={character} />
+        <SkillsSection />
+        <RelationsSection relations={relations} />
+        <RelatedArticlesSection articles={relatedArticle} entitySlug={slug} entityType="characters" />
+        <CommentSection pageId={page.id} />
 
-  return (
-    <SiteShell pageNavItems={pageNavItems}>
-
-      {/* アイキャッチ */}
-      <Surface
-        variant="raised"
-        className="h-40 md:h-52 flex items-center justify-center"
-      >
-        アイキャッチ画像
-      </Surface>
-
-      <ProfileSection character={character} />
-      <SkillsSection />
-      <RelationsSection relations={relations} />
-      <RelatedArticlesSection articles={relatedArticle} entitySlug={slug} entityType="characters"/>
-      <CommentSection comments={comments} pageId={page.id}/>
-
-    </SiteShell>
-  )
+      </SiteShell>
+    )
+  } catch (err) {
+    // サーバー側ログに詳細を出す
+    console.error("CharacterDetailPage DB error:", err);
+    // ユーザー向けは汎用メッセージ
+    return <div>データの取得中にエラーが発生しました。</div>;
+  }
 }

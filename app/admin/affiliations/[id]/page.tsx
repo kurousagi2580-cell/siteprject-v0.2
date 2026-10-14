@@ -1,24 +1,16 @@
-import AffiliationForm from "@/components/admin/affiliation-form"
-import type { Affiliation } from "@/types/affiliation"
-import { fetchData } from "@/lib/supabase/queries"
-import { getAffiliations } from "@/lib/supabase/get-affiliations"
+
+import AffiliationForm from "@/components/entities/affiliation/affiliation-form"
+import { getAffiliationById, getAffiliationList } from "@/actions/affiliations-actions-server";
+import type { Affiliation } from "@/types/affiliation";
 
 export default async function Page({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params
 
-  const affiliation = await fetchData<Affiliation>("affiliation", {
-      select: "id, name, short_name, icon_url, category, parent_affiliation_id, slug, created_at",
-      filters: [{ column: "id", operator: "eq", value: id }],
-      single:true
-    })
+  const affiliation = await getAffiliationById(id);
+  if (!affiliation) return null;
 
-  const affiliations = await getAffiliations()
-  
-  console.log(affiliation)
+  const affRes = await getAffiliationList();
+  const affiliations: Affiliation[] = affRes?.items ?? []
 
-  if (!affiliation) {
-    return null
-  }
-
-  return <AffiliationForm mode="edit" initialData={affiliation} affiliations={affiliations}/>
+  return <AffiliationForm mode="edit" initialData={affiliation} affiliations={affiliations} />
 }

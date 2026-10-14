@@ -1,18 +1,46 @@
 // components/search/search-tabs.tsx
-"use client"
+"use client";
 
-import { CardPanel } from "@/components/ui/card-panel"
-
-type TabKey = "all" | "characters" | "affiliations" | "countries" | "regions" | "events"
+import { CardPanel } from "@/components/ui/card-panel";
+import { useRouter, useSearchParams } from "next/navigation";
+import { isSearchTabKey, type SearchTabKey } from "@/types/utils/tab";
 
 type SearchTabsProps = {
-  tab: TabKey
-  setTab: (tab: TabKey) => void
-  goToPage: (page: number) => void
-}
+  tab: SearchTabKey;
+  setTab: (tab: string) => void;
+  goToPage: (page: number) => void;
+};
 
-export function SearchTabs({ tab, setTab, goToPage }:SearchTabsProps) {
-  const tabs: TabKey[] = ["all", "characters", "affiliations", "countries", "regions", "events"]
+export function SearchTabs({ tab, setTab, goToPage }: SearchTabsProps) {
+  const tabs: string[] = ["all", "characters", "affiliations", "countries", "regions", "events"];
+  const router = useRouter();
+  const params = useSearchParams();
+
+  function handleClick(cat: string) {
+    // update local state immediately for snappy UI
+    setTab(cat);
+    goToPage(1);
+
+    // build new query params based on current ones
+    const q = new URLSearchParams(Array.from(params.entries()));
+    if (cat === "all") q.delete("tab");
+    else q.set("tab", cat);
+    // reset page when switching tab
+    q.delete("page");
+
+    const query = q.toString();
+    const newUrl = query ? `/search?${query}` : `/search`;
+
+    // guard: avoid pushing same URL repeatedly
+    try {
+      const current = window.location.pathname + window.location.search;
+      if (current === newUrl) return;
+    } catch (e) {
+      // SSR: window not available — ignore
+    }
+
+    router.push(newUrl);
+  }
 
   return (
     <CardPanel className="flex flex-col gap-4">
@@ -20,14 +48,9 @@ export function SearchTabs({ tab, setTab, goToPage }:SearchTabsProps) {
         {tabs.map((cat) => (
           <button
             key={cat}
-            onClick={() => {
-              setTab(cat)
-              goToPage(1)
-            }}
+            onClick={() => handleClick(cat)}
             className={`px-3 py-2 rounded text-sm hover:bg-ananta-accent/80 ${
-              tab === cat
-                ? "bg-ananta-accent text-black font-bold"
-                : "bg-ananta-surface2 text-ananta-text"
+              tab === cat ? "bg-ananta-accent text-black font-bold" : "bg-ananta-surface2 text-ananta-text"
             }`}
           >
             {cat === "all" && "ALL"}
@@ -40,5 +63,5 @@ export function SearchTabs({ tab, setTab, goToPage }:SearchTabsProps) {
         ))}
       </div>
     </CardPanel>
-  )
+  );
 }

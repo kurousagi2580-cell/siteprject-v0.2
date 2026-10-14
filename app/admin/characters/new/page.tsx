@@ -1,7 +1,11 @@
-import CharacterForm from "@/components/admin/character-form"
-import { getAffiliations } from "@/lib/supabase/get-affiliations"
+
+import CharacterForm from "@/components/entities/character/character-form"
+import { getAffiliationList } from "@/actions/affiliations-actions-server";
 
 export default async function Page() {
-  const affiliations = await getAffiliations()
+
+  const affRes = await getAffiliationList();
+  const affiliations = affRes?.items ?? []
+
   return <CharacterForm mode="create" affiliations={affiliations} />
 }

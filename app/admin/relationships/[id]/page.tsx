@@ -1,26 +1,20 @@
-import { fetchData } from "@/lib/supabase/queries"
-import { getCharacters } from "@/lib/supabase/get-characters"
-import RelationShipsForm from "@/components/admin/relationship-form"
-import { Relationship } from "@/types/relationships"
 
-export default async function RelationshipsEditPage({ params }: { params: Promise<{ id: string }> }) {
+import RelationshipForm from "@/components/entities/relationship/relationship-form-wrapper"
+import { getRelationById } from "@/actions/relations-actions-server";
+import { getCharacterByList } from "@/actions/characters-actions-server";
+
+export default async function Page({ params }: { params: Promise<{ id: string }> }) {
+
   const { id } = await params
 
-  const characters = await getCharacters()
+  const charaRes = await getCharacterByList();
+  const characters = charaRes?.items ?? []
 
-  if (!characters) {
-    return null
-  }
+  const relation = await getRelationById(id);
+  if (!relation) return null;
 
-  const relationships = await fetchData<Relationship>("relationships", {
-    select: "id, character_id, target_character_id, relation_type, direction, relation_description, updated_at",
-    filters: [{ column: "id", operator: "eq", value: id }],
-    single: true
-  })
+  const safe = { ...relation, updated_at: relation.updated_at?.toString?.() };
 
-  if (!relationships) {
-    return null
-  }
-
-  return <RelationShipsForm mode="edit" initialData={relationships} characters={characters}/>
+  return <RelationshipForm mode="edit" initialData={safe} characters={characters} />
 }
+

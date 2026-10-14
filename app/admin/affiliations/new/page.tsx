@@ -1,7 +1,11 @@
-import AffiliationForm from "@/components/admin/affiliation-form"
-import { getAffiliations } from "@/lib/supabase/get-affiliations"
+import AffiliationForm from "@/components/entities/affiliation/affiliation-form"
+import { getAffiliationList } from "@/actions/affiliations-actions-server";
+import type { Affiliation } from "@/types/affiliation";
 
 export default async function Page() {
-  const affiliations = await getAffiliations()
+
+  const affRes = await getAffiliationList();
+    const affiliations: Affiliation[] = affRes?.items ?? []
+
   return <AffiliationForm mode="create" affiliations={affiliations} />
 }

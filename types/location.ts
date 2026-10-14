@@ -4,7 +4,7 @@ export type Location = {
   fast_travel: boolean
   x: number
   y: number
-  parent_region_id: string // game_maps.id
+  parent_region_id: string // game_regions.id
   slug: string
-  create_at: string
+  created_at: string
 }

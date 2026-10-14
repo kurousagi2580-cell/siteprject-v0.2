@@ -1,8 +1,6 @@
-
-import EventsForm from "@/components/admin/event-form"
-
+import EventForm from "@/components/entities/event/event-form"
 
 export default async function Page() {
 
-  return <EventsForm mode="create" />
+  return <EventForm mode="create"  />
 }

@@ -1,12 +1,10 @@
-
-import { getRegions } from "@/lib/supabase/get-regions"
-import LocationForm from "@/components/admin/location-form"
-
+import LocationForm from "@/components/entities/location/location-form"
+import { getRegionList } from "@/actions/regions-actions-server";
 
 export default async function Page() {
-  const regions = await getRegions()
-  if (!regions) {
-    return null
-  }
+
+  const regRes = await getRegionList();
+  const regions = regRes?.items ?? []
+
   return <LocationForm mode="create" regions={regions} />
 }

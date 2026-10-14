@@ -1,23 +1,17 @@
-import { SiteShell } from "@/components/site-shell"
-import DataManageList from "@/components/admin/data-manage-list"
+import { SiteShell } from "@/components/layout/site-shell"
+import AdminDBClient from "@/components/admin/admin-db-client"
 import { Surface } from "@/components/ui/surface"
 
-import { getCharacters } from "@/lib/supabase/get-characters"
-import { getAffiliations } from "@/lib/supabase/get-affiliations"
-import { getCountries } from "@/lib/supabase/get-countries"
-import { getRegions } from "@/lib/supabase/get-regions"
-import { getLocations } from "@/lib/supabase/get-locations"
-import { getGameEvents } from "@/lib/supabase/get-events"
-import { getRelationships } from "@/lib/supabase/get-relationships"
+import { makeCrudActions } from "@/actions/make-crud-actions";
 
 export default async function AdminDBPage() {
-    const characters = await getCharacters()
-    const affiliations = await getAffiliations()
-    const coutries = await getCountries()
-    const regions = await getRegions()
-    const locations = await getLocations()
-    const events = await getGameEvents()
-    const relationships = await getRelationships()
+    const characters = (await makeCrudActions("characters", "name").list()).items;
+    const affiliations = (await makeCrudActions("affiliation", "name").list()).items;
+    const coutries = (await makeCrudActions("countries", "name").list()).items;
+    const regions = (await makeCrudActions("regions", "name").list()).items;
+    const locations = (await makeCrudActions("locations", "name").list()).items;
+    const events = (await makeCrudActions("game_events", "title").list()).items;
+    const relationships = (await makeCrudActions("relationships", "character_id").list()).items;
 
     return (
         <SiteShell>
@@ -25,72 +19,53 @@ export default async function AdminDBPage() {
                 管理者用ぺージ
             </Surface>
 
-            <DataManageList
-                id="characters"
-                title="CHARACTERS"
-                subtitle="キャラクター一覧"
+            <AdminDBClient
                 items={characters}
                 hrefBase="/admin/characters"
-                nameKey="name"
-                imageKey="image_url"
+                title="CHARACTERS"
+                subtitle="キャラクター一覧"
             />
 
-            <DataManageList
-                id="affiliations"
-                title="AFFILIATIONS"
-                subtitle="所属一覧"
+            <AdminDBClient
                 items={affiliations}
                 hrefBase="/admin/affiliations"
-                nameKey="name"
-                imageKey="icon_url"
+                title="AFFILIATIONS"
+                subtitle="所属一覧"
             />
 
-            <DataManageList
-                id="relation"
-                title="RELATIONS"
-                subtitle="キャラクターの関係性"
+            <AdminDBClient
                 items={relationships}
                 hrefBase="/admin/relationships"
-                nameKey="relation_summary"
+                title="RELATIONS"
+                subtitle="キャラクターの関係性"
             />
 
-            <DataManageList
-                id="coutries"
-                title="COUNTRIES"
-                subtitle="国一覧"
+            <AdminDBClient
                 items={coutries}
                 hrefBase="/admin/countries"
-                nameKey="name"
-                imageKey="image_url"
+                title="COUNTRIES"
+                subtitle="国一覧"
             />
 
-            <DataManageList
-                id="maps"
+            <AdminDBClient
+                items={regions}
+                hrefBase="/admin/regions"
                 title="REGIONS"
                 subtitle="地域一覧"
-                items={regions}
-                hrefBase="/admin/maps"
-                nameKey="name"
-                imageKey="image_url"
             />
 
-            <DataManageList
-                id="locations"
-                title="LOCATIONS"
-                subtitle="場所一覧"
+            <AdminDBClient
                 items={locations}
                 hrefBase="/admin/locations"
-                nameKey="name"
+                title="LOCATIONS"
+                subtitle="場所一覧"
             />
 
-            <DataManageList
-                id="events"
-                title="EVENTS"
-                subtitle="イベント情報一覧"
+            <AdminDBClient
                 items={events}
                 hrefBase="/admin/events"
-                nameKey="title"
-                imageKey="image_url"
+                title="EVENTS"
+                subtitle="イベント情報一覧"
             />
 
         </SiteShell>

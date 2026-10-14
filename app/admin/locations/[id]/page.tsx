@@ -1,25 +1,17 @@
-import { fetchData } from "@/lib/supabase/queries"
-import { getRegions } from "@/lib/supabase/get-regions"
-import LocationForm from "@/components/admin/location-form"
-import { Location } from "@/types/location"
+import LocationForm from "@/components/entities/location/location-form"
+import { getLocationById } from "@/actions/locations-actions-server";
+import { getRegionList } from "@/actions/regions-actions-server";
 
 export default async function LocationsEditPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params
-    
-  const regions = await getRegions()
-    if (!regions) {
-      return null
-    }
 
-    const locations = await fetchData<Location>("regions", {
-      select: "id, name, fast_travel, x, y, parent_region_id, created_at",
-      filters: [{ column: "id", operator: "eq", value: id }],
-      single: true
-    })
-  
-    if (!locations) {
-      return null
-    }
+  const regRes = await getRegionList();
+  const regions = regRes?.items ?? []
 
-  return <LocationForm mode= "edit" initialData={locations} regions={regions}/>
+  const location = await getLocationById(id);
+  if (!location) return null;
+
+  const safe = { ...location, created_at: location.created_at?.toString?.()};
+
+  return <LocationForm mode="edit" initialData={safe} regions={regions} />
 }

@@ -23,5 +23,6 @@ export type Region = {
   map_x: number
   map_y: number
   slug: string | null
-  Locations?: Location[]
+  created_at: string | null
+  updated_at: string | null
 }
