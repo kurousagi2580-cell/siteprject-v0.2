@@ -1,8 +1,10 @@
+import { requireAdminPage } from "@/lib/auth/require-admin";
 // src/app/admin/articles/[id]/page.tsx など
 import { getNameMappingsById } from "@/actions/namemaps-actions-server";
 import NameMappingFormWrapper from "@/components/entities/namemapiings/namemapping-form";
 
 export default async function ArticleEditPage({ params }: { params: Promise<{ id: string }> }) {
+  await requireAdminPage();
   const { id } = await params;
 
   const namemapping = await getNameMappingsById(id);

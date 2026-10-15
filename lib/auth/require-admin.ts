@@ -1,77 +1,53 @@
-// lib/auth/require-admin.ts（人称実装前の最小構成）
-import { headers } from "next/headers";
-import { createClient } from "@supabase/supabase-js";
+// lib/auth/require-admin.ts
+// 管理者認証の中核。管理操作はすべてここを通す。
+import "server-only";
+import { NextResponse } from "next/server";
+import { redirect } from "next/navigation";
+import { createSupabaseSessionClient } from "@/lib/supabase/ssr";
 
-const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL!;
-const SUPABASE_ANON_KEY = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
-
-function parseCookies(cookieHeader: string | null) {
-  const out: Record<string,string> = {};
-  if (!cookieHeader) return out;
-  for (const part of cookieHeader.split(";")) {
-    const [k, ...v] = part.split("=");
-    if (!k) continue;
-    out[k.trim()] = decodeURIComponent((v || []).join("=").trim());
+export class AuthError extends Error {
+  constructor(public status: 401 | 403) {
+    super(status === 401 ? "unauthenticated" : "forbidden");
   }
-  return out;
 }
 
-async function getToken() {
-  const h = await headers();
-  const auth = h.get("authorization");
-  if (auth?.startsWith("Bearer ")) return auth.slice("Bearer ".length);
+/**
+ * ログイン中の管理者を返す。未ログインなら 401、管理者でなければ 403 の AuthError を投げる。
+ * - JWT は getClaims() で検証し、通常の権限確認で Auth サーバーを呼び出さない
+ * - 権限は app_metadata.role で判定する。
+ *   user_metadata はユーザー本人が書き換えられるので、権限判定には絶対に使わない。
+ */
+export async function getAdminUser() {
+  const supabase = await createSupabaseSessionClient();
+  const { data, error } = await supabase.auth.getClaims();
+  const claims = data?.claims;
 
-  const cookieHeader = h.get("cookie");
-  const cookies = parseCookies(cookieHeader);
+  if (error || !claims || typeof claims.sub !== "string") throw new AuthError(401);
+  if (claims.app_metadata?.role !== "admin") throw new AuthError(403);
+  return claims;
+}
 
-  const candidates = [
-    "sb-access-token",
-    "sb:token",
-    "supabase-auth-token",
-    "supabase-session",
-  ];
-
-  for (const name of candidates) {
-    const raw = cookies[name];
-    if (!raw) continue;
-    try {
-      const parsed = JSON.parse(raw);
-      return parsed?.access_token ?? parsed?.accessToken ?? raw;
-    } catch {
-      return raw;
+/** API ルート用。呼び出し側は `const denied = await guardAdmin(); if (denied) return denied;` と書く。 */
+export async function guardAdmin(): Promise<NextResponse | null> {
+  try {
+    await getAdminUser();
+    return null;
+  } catch (e) {
+    if (e instanceof AuthError) {
+      return NextResponse.json({ success: false, error: e.message }, { status: e.status });
     }
+    throw e;
   }
-
-  return null;
 }
 
-export async function requireAdmin() {
-  const token = getToken();
-  if (!token) {
-    const e: any = new Error("unauthenticated");
-    e.status = 401;
+/** 管理ページ（Server Component）用。未ログイン／非管理者は /login へリダイレクトする。 */
+export async function requireAdminPage(next = "/admin") {
+  try {
+    return await getAdminUser();
+  } catch (e) {
+    if (e instanceof AuthError) {
+      redirect(`/login?next=${encodeURIComponent(next)}`);
+    }
     throw e;
   }
-
-  const client = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
-    global: { headers: { Authorization: `Bearer ${token}` } },
-    auth: { persistSession: false, autoRefreshToken: false },
-  });
-
-  const { data, error } = await client.auth.getUser();
-  if (error || !data?.user) {
-    const e: any = new Error("unauthenticated");
-    e.status = 401;
-    throw e;
-  }
-
-  const user = data.user;
-  if (!user.user_metadata?.is_admin) {
-    const e: any = new Error("forbidden");
-    e.status = 403;
-    throw e;
-  }
-
-  // 返却しない（人称実装前の状態）
-  return;
 }

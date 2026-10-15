@@ -1,5 +1,4 @@
-// components/article/article-page.tsx
-import React from "react";
+
 import { SiteShell } from "@/components/layout/site-shell";
 import { Surface } from "@/components/ui/surface";
 import ArticleBody from "@/components/article/article-body";
@@ -45,7 +44,7 @@ export default async function ArticlePage({ id, slug, entitySlug, entityType, pr
 
   return (
     <SiteShell pageNavItems={pageNavItems} headerOffset={80}>
-      <Surface variant="raised" className="bg-ananta-surface/40 backdrop-blur-xl border border-ananta-border/40 shadow-[inset_0_0_20px_rgba(0,0,0,0.45)] rounded-xl p-6 md:p-8 flex flex-col gap-6">
+      <Surface variant="raised" className="bg-ananta-surface/40 backdrop-blur-xl border border-ananta-border/40 rounded-xl p-6 md:p-8 flex flex-col gap-6">
         <header className="flex flex-col gap-2">
           <span className="text-xs font-medium text-ananta-muted tracking-wide uppercase">{article.category}</span>
           <h1 className="text-2xl font-bold text-ananta-text">{article.title}</h1>
@@ -59,18 +58,12 @@ export default async function ArticlePage({ id, slug, entitySlug, entityType, pr
           </div>
         </header>
 
-        <hr className="border-ananta-border/500" />
-
         {article.eyecatch && <div className="mb-4">{article.eyecatch}</div>}
 
         <div className="prose prose-invert max-w-none">
-
-
-          <ArticleBody html={html} headings={headings} />
+          <ArticleBody html={html} />
 
         </div>
-
-        <hr className="border-ananta-border/500" />
       </Surface>
     </SiteShell>
   );

@@ -16,9 +16,9 @@ export async function renderMarkdownToHtml(markdown: string) {
   const file = await unified()
     .use(remarkParse)
     .use(remarkRehype, { allowDangerousHtml: false })
-    .use(rehypeSlug)
     .use(rehypeEmbed)
     .use(rehypeSanitize, schema)
+    .use(rehypeSlug)
     .use(rehypeStringify)
     .process(markdown);
 

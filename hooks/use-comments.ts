@@ -9,7 +9,7 @@ export default function useComments({ pageId, parentId = null }: { pageId: strin
     setLoading(true);
     setError(null);
     try {
-      const res = await fetch(`/api/admin/comments`, {
+      const res = await fetch(`/api/comments`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({

@@ -1,9 +1,10 @@
 
 import "server-only";
 import { makeCrudActions } from "@/actions/make-crud-actions";
-import type { Comment } from "@/types/comment";
+import type { Comment, CommentView } from "@/types/comment";
 
-const actions = makeCrudActions<Comment>("comments", "page_id");
+const actions = makeCrudActions<Comment>("comments", "page_id", { publicCreate: true }); // 投稿だけ公開。更新・削除は管理者のみ
+const view_actions = makeCrudActions<CommentView>("comments_view", "page_id"); // 公開してよいものだけのビュー
 
 export async function createCommentFromObject(payload: Record<string, any>) {
   // 必要なサーバー側バリデーションをここで行う
@@ -23,15 +24,15 @@ export async function deleteComment(id: string) {
 }
 
 export async function getCommentById(id: string) {
-  return await actions.getById(id);
+  return await view_actions.getById(id);
 }
 
 export async function getCommentList() {
-  return await actions.list();
+  return await view_actions.list();
 }
 
 export async function getCommentListByPage(page_id: string) {
-  return await actions.list({
+  return await view_actions.list({
   filters: page_id,
   page: 1,
   pageSize: 20,

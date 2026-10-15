@@ -1,9 +1,10 @@
-
+import { requireAdminPage } from "@/lib/auth/require-admin";
 import RelationshipForm from "@/components/entities/relationship/relationship-form-wrapper"
 import { getRelationById } from "@/actions/relations-actions-server";
 import { getCharacterByList } from "@/actions/characters-actions-server";
 
 export default async function Page({ params }: { params: Promise<{ id: string }> }) {
+  await requireAdminPage();
 
   const { id } = await params
 

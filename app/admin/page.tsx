@@ -1,23 +1,49 @@
+import { requireAdminPage } from "@/lib/auth/require-admin";
 import { SiteShell } from "@/components/layout/site-shell"
 import AdminDBClient from "@/components/admin/admin-db-client"
 import { Surface } from "@/components/ui/surface"
+import { logout } from "@/app/login/actions"
 
 import { makeCrudActions } from "@/actions/make-crud-actions";
 
 export default async function AdminDBPage() {
-    const characters = (await makeCrudActions("characters", "name").list()).items;
-    const affiliations = (await makeCrudActions("affiliation", "name").list()).items;
-    const coutries = (await makeCrudActions("countries", "name").list()).items;
-    const regions = (await makeCrudActions("regions", "name").list()).items;
-    const locations = (await makeCrudActions("locations", "name").list()).items;
-    const events = (await makeCrudActions("game_events", "title").list()).items;
-    const relationships = (await makeCrudActions("relationships", "character_id").list()).items;
+  await requireAdminPage();
+    const [
+        charactersResult,
+        affiliationsResult,
+        countriesResult,
+        regionsResult,
+        locationsResult,
+        eventsResult,
+        relationshipsResult,
+    ] = await Promise.all([
+        makeCrudActions("characters", "name").list(),
+        makeCrudActions("affiliation", "name").list(),
+        makeCrudActions("countries", "name").list(),
+        makeCrudActions("regions", "name").list(),
+        makeCrudActions("locations", "name").list(),
+        makeCrudActions("game_events", "title").list(),
+        makeCrudActions("relationships", "character_id").list(),
+    ]);
+    const characters = charactersResult.items;
+    const affiliations = affiliationsResult.items;
+    const countries = countriesResult.items;
+    const regions = regionsResult.items;
+    const locations = locationsResult.items;
+    const events = eventsResult.items;
+    const relationships = relationshipsResult.items;
 
     return (
         <SiteShell>
             <Surface variant="raised" className="h-52 md:h-64 flex items-center justify-center text-xl font-bold">
                 管理者用ぺージ
             </Surface>
+
+            <form action={logout} className="flex justify-end">
+                <button type="submit" className="rounded border border-ananta-border px-3 py-1 text-sm text-ananta-muted hover:text-ananta-text">
+                    ログアウト
+                </button>
+            </form>
 
             <AdminDBClient
                 items={characters}
@@ -41,7 +67,7 @@ export default async function AdminDBPage() {
             />
 
             <AdminDBClient
-                items={coutries}
+                items={countries}
                 hrefBase="/admin/countries"
                 title="COUNTRIES"
                 subtitle="国一覧"

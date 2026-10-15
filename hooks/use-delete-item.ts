@@ -12,8 +12,10 @@ export function useDeleteItem() {
     setStatus("");
     setLoadingId(id);
     try {
-      // API パスはプロジェクトに合わせて調整してください
-      const res = await fetch(`/api/${hrefBase}/${encodeURIComponent(id)}`, { method: "DELETE" });
+      const resourcePath = hrefBase
+        .replace(/^\/+|\/+$/g, "")
+        .replace(/^admin\//, "");
+      const res = await fetch(`/api/admin/${resourcePath}/${encodeURIComponent(id)}`, { method: "DELETE" });
       if (!res.ok) {
         const text = await res.text();
         throw new Error(text || `HTTP ${res.status}`);

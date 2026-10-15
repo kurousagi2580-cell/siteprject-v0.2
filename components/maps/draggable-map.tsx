@@ -1,5 +1,6 @@
 "use client"
 
+import { AppImage } from "@/components/app-image"
 import { useRef, useState } from "react"
 
 interface DraggableMapProps {
@@ -43,9 +44,13 @@ export function DraggableMap({ src, className }: DraggableMapProps) {
         }}
         className="absolute top-0 left-0"
       >
-        <img
+        <AppImage
           src={src}
           alt="map"
+          width={1600}
+          height={900}
+          sizes="200vw"
+          style={{ aspectRatio: "auto", maxWidth: "none" }}
           className="w-[200%] h-auto select-none pointer-events-none"
         />
       </div>

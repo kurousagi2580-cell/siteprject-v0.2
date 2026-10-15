@@ -1,5 +1,6 @@
 
 import { CategorySection } from "./category-section"
+import { AppImage } from "@/components/app-image"
 import { CategoryPanel } from "./category-panel"
 import { LinkCardBox } from "../ui/link-card-box"
 import { CardPanel } from "../ui/card-panel"
@@ -53,10 +54,13 @@ export function SearchResults({
                     href={`/affiliations/${a.id}`}
                     className="w-full hover:opacity-90"
                 >
-                    <img
+                    <AppImage
                         src={a.image_url || "/placeholder.png"}
                         alt={a.name}
-                        className="w-full object-cover rounded-sm"
+                        width={400}
+                        height={300}
+                        sizes="(max-width: 768px) 50vw, 25vw"
+                        className="w-full aspect-[4/3] object-cover rounded-sm"
                     />
                     <p className="mt-2 text-center text-sm">{a.name}</p>
                 </LinkCardBox>
@@ -71,10 +75,13 @@ export function SearchResults({
                     href={`/affiliations/${a.id}`}
                     className="w-full hover:opacity-90"
                 >
-                    <img
+                    <AppImage
                         src={a.icon_url || "/placeholder.png"}
                         alt={a.name}
-                        className="w-full object-cover rounded-sm"
+                        width={400}
+                        height={300}
+                        sizes="(max-width: 768px) 50vw, 25vw"
+                        className="w-full aspect-[4/3] object-cover rounded-sm"
                     />
                     <p className="mt-2 text-center text-sm">{a.name}</p>
                 </LinkCardBox>
@@ -89,10 +96,13 @@ export function SearchResults({
                     href={`/affiliations/${a.id}`}
                     className="w-full hover:opacity-90"
                 >
-                    <img
+                    <AppImage
                         src={a.image_url || "/placeholder.png"}
                         alt={a.name}
-                        className="w-full object-cover rounded-sm"
+                        width={400}
+                        height={300}
+                        sizes="(max-width: 768px) 50vw, 25vw"
+                        className="w-full aspect-[4/3] object-cover rounded-sm"
                     />
                     <p className="mt-2 text-center text-sm">{a.name}</p>
                 </LinkCardBox>
@@ -105,10 +115,13 @@ export function SearchResults({
                     href={`/affiliations/${a.id}`}
                     className="w-full hover:opacity-90"
                 >
-                    <img
+                    <AppImage
                         src={a.image_url || "/placeholder.png"}
                         alt={a.name}
-                        className="w-full object-cover rounded-sm"
+                        width={400}
+                        height={300}
+                        sizes="(max-width: 768px) 50vw, 25vw"
+                        className="w-full aspect-[4/3] object-cover rounded-sm"
                     />
                     <p className="mt-2 text-center text-sm">{a.name}</p>
                 </LinkCardBox>
@@ -121,10 +134,13 @@ export function SearchResults({
                     href={`/affiliations/${a.id}`}
                     className="w-full hover:opacity-90"
                 >
-                    <img
+                    <AppImage
                         src={a.image_url || "/placeholder.png"}
                         alt={a.title}
-                        className="w-full object-cover rounded-sm"
+                        width={400}
+                        height={300}
+                        sizes="(max-width: 768px) 50vw, 25vw"
+                        className="w-full aspect-[4/3] object-cover rounded-sm"
                     />
                     <p className="mt-2 text-center text-sm">{a.title}</p>
                 </LinkCardBox>

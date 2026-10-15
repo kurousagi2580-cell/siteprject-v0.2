@@ -4,7 +4,7 @@
 import { useState, useMemo, useEffect } from "react";
 import useTab from "@/hooks/use-tab";
 
-import { SearchBar } from "@/components/search/search-bor";
+import { SearchBar } from "@/components/search/search-bar";
 import { SearchTabs } from "@/components/search/search-tabs";
 import { isSearchTabKey, type SearchTabKey } from "@/types/utils/tab";
 import { SearchResults } from "@/components/search/search-results";

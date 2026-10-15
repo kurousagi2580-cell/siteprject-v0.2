@@ -1,5 +1,6 @@
 // components/character/ProfileSection.tsx
 import { CardBox } from "@/components/ui/card-box"
+import { AppImage } from "@/components/app-image"
 import { CardPanel } from "@/components/ui/card-panel"
 import { GameSectionTitle } from "@/components/ui/game-section-title"
 import { Section } from "@/components/ui/section"
@@ -21,12 +22,14 @@ export function ProfileSection({
       <div className="flex flex-col gap-4 md:flex-row">
         {/* サムネイル */}
         <CardBox
-          className={`${ASPECT.CHARACTER_CARD} w-full flex items-center justify-center text-base md:w-[300px] md:shrink-0`}
+          className={`relative ${ASPECT.CHARACTER_CARD} w-full overflow-hidden flex items-center justify-center text-base md:w-[300px] md:shrink-0`}
         >
-          <img
+          <AppImage
             src={character.image_url || "/noimage.png"}
             alt={character.name}
-            className="w-full h-full object-cover"
+            fill
+            sizes="(max-width: 768px) 100vw, 300px"
+            className="object-cover"
           />
         </CardBox>
 

@@ -1,14 +1,15 @@
 // markdown/headings.ts
 import { unified } from "unified";
 import remarkParse from "remark-parse";
-import { visit } from "unist-util-visit";
+import { visit} from "unist-util-visit";
 import type { Parent } from "unist";
-import { slugify } from "./utils/slugify";
+import GithubSlugger from "github-slugger"
 
 export type HeadingItem = { id: string; text: string; level: number };
 
-export async function extractHeadings(markdown: string): Promise<HeadingItem[]> {
+export function extractHeadings(markdown: string): HeadingItem[] {
   const tree = unified().use(remarkParse).parse(markdown) as Parent;
+  const slugger = new GithubSlugger()
   const headings: HeadingItem[] = [];
 
   visit(tree, "heading", (node: any) => {
@@ -21,7 +22,7 @@ export async function extractHeadings(markdown: string): Promise<HeadingItem[]> 
     const text = textParts.join("").trim();
     if (!text) return;
     headings.push({
-      id: slugify(text),
+      id: slugger.slug(text),
       text,
       level: node.depth
     });

@@ -1,5 +1,6 @@
 
 import { notFound } from "next/navigation"
+import { AppImage } from "@/components/app-image"
 import { SiteShell } from "@/components/layout/site-shell"
 import { Surface } from "@/components/ui/surface"
 import MapClient from "@/components/maps/map-client"
@@ -35,12 +36,14 @@ export default async function RegionListPage({
       {/* 国のアイキャッチ */}
       <Surface
         variant="raised"
-        className="h-52 md:h-72 flex items-center justify-center"
+        className="relative h-52 md:h-72 flex items-center justify-center overflow-hidden"
       >
-        <img
+        <AppImage
           src={country.image_url || "/noimage.png"}
           alt={country.name}
-          className="w-full h-full object-cover rounded-sm"
+          fill
+          sizes="(max-width: 768px) 100vw, 75vw"
+          className="object-cover rounded-sm"
         />
       </Surface>
 

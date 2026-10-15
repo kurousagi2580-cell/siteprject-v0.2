@@ -1,9 +1,10 @@
-
+import { requireAdminPage } from "@/lib/auth/require-admin";
 import CharacterForm from "@/components/entities/character/character-form"
 import { getCharacterById } from "@/actions/characters-actions-server";
 import { getAffiliationList } from "@/actions/affiliations-actions-server";
 
 export default async function Page({ params }: { params: Promise<{ id: string }> }) {
+  await requireAdminPage();
   const { id } = await params
 
   const affRes = await getAffiliationList();

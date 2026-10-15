@@ -1,12 +1,13 @@
 
 import "server-only";
 import { NextResponse } from "next/server";
+import { guardAdmin } from "@/lib/auth/require-admin";
 import { createLocationFromObject } from "@/actions/locations-actions-server";
 import { sanitizePayload } from "@/lib/utils/sanitize-ids"
-//import { requireAdmin } from "@/auth/require-admin";
 
 export async function POST(req: Request) {
-  //await requireAdmin();
+  const denied = await guardAdmin();
+  if (denied) return denied;
   const payload = await req.json();
   const sanitized = sanitizePayload(payload, ["x", "y"]);
   const res = await createLocationFromObject(sanitized);

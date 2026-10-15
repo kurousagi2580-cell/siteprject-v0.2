@@ -1,7 +1,7 @@
 "use client"
 
 import { CardPanel } from "@/components/ui/card-panel"
-import { Pagination } from "./pagenation"
+import { Pagination } from "./pagination"
 
 type CategoryPanelProps<T> = {
   title: string

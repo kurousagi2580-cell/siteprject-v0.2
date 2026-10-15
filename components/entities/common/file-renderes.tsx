@@ -2,6 +2,7 @@
 "use client";
 
 import React from "react";
+import { AppImage } from "@/components/app-image"
 
 export type FieldType = "text" | "number" | "textarea" | "select" | "image" | "markdown" | "checkbox" | "date";
 
@@ -40,7 +41,18 @@ export function renderInput(field: SchemaField, value: any, onChange: (v: any) =
       return (
         <div className="flex flex-col gap-2">
           <input type="text" value={value ?? ""} placeholder={field.placeholder ?? "画像URLを入力"} className={commonClass} onChange={(e) => onChange(e.target.value)} />
-          {value ? <img src={String(value)} alt={field.label ?? ""} className="max-h-40 object-cover rounded" /> : null}
+          {value ? (
+            <div className="relative h-40 w-full">
+              <AppImage
+                src={String(value)}
+                alt={field.label ?? ""}
+                fill
+                unoptimized
+                sizes="320px"
+                className="object-contain rounded"
+              />
+            </div>
+          ) : null}
         </div>
       );
     case "markdown":

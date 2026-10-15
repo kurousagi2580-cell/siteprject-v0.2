@@ -1,9 +1,11 @@
+import { requireAdminPage } from "@/lib/auth/require-admin";
 // src/app/admin/articles/[id]/page.tsx など
 import { getArticleById } from "@/actions/articles-actions-server";
 import { getPageList } from "@/actions/pages-actions-server";
 import ArticleForm from "@/components/entities/article/article-form";
 
 export default async function ArticleEditPage({ params }: { params: Promise<{ id: string }> }) {
+  await requireAdminPage();
   const { id } = await params;
   const pageData = await getPageList() ?? [];
 

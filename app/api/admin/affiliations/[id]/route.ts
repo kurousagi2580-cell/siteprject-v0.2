@@ -1,13 +1,14 @@
 
 import "server-only";
 import { NextResponse } from "next/server";
+import { guardAdmin } from "@/lib/auth/require-admin";
 import { updateAffiliationFromObject, getAffiliationById } from "@/actions/affiliations-actions-server";
 import { sanitizePayload } from "@/lib/utils/sanitize-ids"
 import { deleteEntityWithPage } from "@/lib/supabase/queries/index"; // server-only helper
-//import { requireAdmin } from "@/auth/require-admin";
 
-export async function GET(req: Request, { params }: { params: { id: string } }) {
-  //await requireAdmin();
+export async function GET(req: Request, { params }: { params: Promise<{ id: string }> }) {
+  const denied = await guardAdmin();
+  if (denied) return denied;
   const { id } = await params;
   if (!id) return NextResponse.json({ success: false, error: "missing id" }, { status: 400 });
   const item = await getAffiliationById(id);
@@ -15,8 +16,9 @@ export async function GET(req: Request, { params }: { params: { id: string } }) 
   return NextResponse.json({ success: true, item });
 }
 
-export async function PUT(req: Request, { params }: { params: { id: string } }) {
-  //wait requireAdmin();
+export async function PUT(req: Request, { params }: { params: Promise<{ id: string }> }) {
+  const denied = await guardAdmin();
+  if (denied) return denied;
   const { id } = await params;
   if (!id) return NextResponse.json({ success: false, error: "missing id" }, { status: 400 });
   const payload = await req.json();
@@ -25,8 +27,9 @@ export async function PUT(req: Request, { params }: { params: { id: string } }) 
   return NextResponse.json(res);
 }
 
-export async function DELETE(req: Request, { params }: { params: { id: string } }) {
-  ///await requireAdmin();
+export async function DELETE(req: Request, { params }: { params: Promise<{ id: string }> }) {
+  const denied = await guardAdmin();
+  if (denied) return denied;
   const { id } = await params;
   if (!id) return NextResponse.json({ success: false, error: "missing id" }, { status: 400 });
   try {

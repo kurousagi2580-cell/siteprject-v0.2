@@ -8,6 +8,19 @@ export type Comment = {
   is_adopted: boolean
   delete_reason?: string
   created_at: string
+  ip: string
+}
+
+export type CommentView = {
+  id: string
+  page_id: string
+  number: number
+  user_name: string
+  content: string
+  parent_id?: string
+  is_adopted: boolean
+  delete_reason?: string
+  created_at: string
 }
 
 export type LatestComment = {
@@ -19,6 +32,6 @@ export type LatestComment = {
     id: string
     slug: string
     title: string
-    type: "country" | "character" | "map" | "page"
+    type: "country" | "character" | "region" | "page"
   }
 }

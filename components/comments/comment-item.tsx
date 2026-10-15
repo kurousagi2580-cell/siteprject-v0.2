@@ -1,5 +1,5 @@
 import { CheckSquare } from "lucide-react"
-import type { Comment } from "@/types/comment"
+import type { CommentView } from "@/types/comment"
 import { CardPanel } from "@/components/ui/card-panel"
 import { toDateTimeString } from "@/lib/utils/toDate"
 
@@ -8,8 +8,8 @@ export function CommentItem({
   comments,
   onReply,
 }: {
-  comment: Comment
-  comments: Comment[]
+  comment: CommentView
+  comments: CommentView[]
   onReply: (id: string) => void
 }) {
   const parentNumber =

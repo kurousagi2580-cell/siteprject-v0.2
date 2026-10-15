@@ -1,8 +1,10 @@
 // src/components/admin/data-table.tsx
 "use client";
 import React from "react";
+import { useRouter } from "next/navigation";
 import { CardPanel } from "@/components/ui/card-panel";
 import { CardBox } from "@/components/ui/card-box";
+import { useDeleteItem } from "@/hooks/use-delete-item";
 
 export type Column<T = any> = {
   key: string;
@@ -29,6 +31,8 @@ export default function DataTable<T = any>({
   subtitle,
   basePath = "",
 }: Props<T>) {
+  const router = useRouter();
+  const { status, deleteItem } = useDeleteItem();
   const keys =
     columns?.map((c) => c.key) ??
     (items[0] ? Object.keys(items[0] as object) : []);
@@ -38,15 +42,8 @@ export default function DataTable<T = any>({
   }
 
   async function handleDelete(id: string) {
-    if (!confirm("削除してよいですか？")) return;
-    const res = await fetch(`/api/admin${basePath}/` + id, { method: "DELETE" });
-    if (!res.ok) {
-      const text = await res.text();
-      alert("削除に失敗しました: " + text);
-      return;
-    }
-    // 最小実装: リロードして最新状態を取得（必要なら楽に差し替え）
-    location.reload();
+    const result = await deleteItem(basePath, id);
+    if (result.success) router.refresh();
   }
 
   if (viewMode === "card") {
@@ -54,6 +51,7 @@ export default function DataTable<T = any>({
       <div className="space-y-4">
         {title && <h2 className="text-xl font-bold">{title}</h2>}
         {subtitle && <p className="text-sm text-ananta-muted">{subtitle}</p>}
+        <p aria-live="polite" className="text-sm text-ananta-muted">{status}</p>
 
         <div className="grid gap-4 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
           {items.map((item) => (
@@ -82,6 +80,7 @@ export default function DataTable<T = any>({
     <div className="space-y-4">
       {title && <h2 className="text-xl font-bold">{title}</h2>}
       {subtitle && <p className="text-sm text-ananta-muted">{subtitle}</p>}
+      <p aria-live="polite" className="text-sm text-ananta-muted">{status}</p>
 
       <CardPanel className="overflow-x-auto">
         <table className="w-full text-sm table-fixed min-w-[600px]">

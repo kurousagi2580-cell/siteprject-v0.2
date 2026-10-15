@@ -9,7 +9,7 @@ import { ExternalLink } from "@/components/external-link"
 import type { Update } from "@/types/update"
 
 export default async function UpdatesPage() {
-    const updates = await (await makeCrudActions<Update>("updates","id").list()).items
+    const updates = (await makeCrudActions<Update>("updates","id").list()).items
 
     return (
         <SiteShell>
@@ -29,7 +29,7 @@ export default async function UpdatesPage() {
                         <ul className="flex flex-col gap-4">
                             {updates.map((up) => (
                                 <li key={up.id} className="flex gap-4 items-center">
-                                    <ExternalLink url="{up.official_url}">
+                                    <ExternalLink url={up.official_url}>
                                         <div className="flex items-center gap-2">
                                             <span className="font-bold text-ananta-text">{up.title}</span>
                                             <span className="text-ananta-muted text-sm">

@@ -1,4 +1,5 @@
 import Link from "next/link"
+import { AppImage } from "@/components/app-image"
 import { FileText, MessageSquare } from "lucide-react"
 import { SiteShell } from "@/components/layout/site-shell"
 import { pages } from "@/lib/data"
@@ -110,11 +111,13 @@ export default async function TopPage() {
           {countries.map((m) => (
 
             <LinkCardBox key={m.slug} href={`/countries/${m.slug}`} className="w-full hover:opacity-90">
-              <div className="w-full bg-ananta-surface rounded-sm overflow-hidden">
-                <img
+              <div className="relative w-full aspect-video bg-ananta-surface rounded-sm overflow-hidden">
+                <AppImage
                   src={m.image_url || "/noimage.png"}
                   alt={m.name}
-                  className={`w-full ${ASPECT.MAP_CARD} object-cover`}
+                  fill
+                  sizes="(max-width: 768px) 50vw, 25vw"
+                  className="object-cover"
                 />
               </div>
 
@@ -205,8 +208,6 @@ export default async function TopPage() {
                   </span>
                 </div>
               </Link>
-
-
 
             </li>
           ))}

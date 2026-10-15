@@ -2,7 +2,7 @@
 "use client";
 
 import { useState } from "react";
-import type { Comment } from "@/types/comment";
+import type { CommentView } from "@/types/comment";
 import {CommentItem} from "@/components/comments/comment-item";
 import ReplyForm from "@/components/comments/reply-form";
 
@@ -10,7 +10,7 @@ export default function CommentListClient({
   comments,
   pageId,
 }: {
-  comments: Comment[];
+  comments: CommentView[];
   pageId: string;
 }) {
   // どのコメントに対して返信フォームを開くかを管理

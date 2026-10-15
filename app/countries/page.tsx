@@ -1,5 +1,6 @@
 
 import { SiteShell } from "@/components/layout/site-shell"
+import { AppImage } from "@/components/app-image"
 import { Surface } from "@/components/ui/surface"
 import { GameSectionTitle } from "@/components/ui/game-section-title"
 import { LinkCardBox } from "@/components/ui/link-card-box"
@@ -36,11 +37,13 @@ export default async function CountryListPage() {
                 <LinkCardBox key={c.slug} href={`/countries/${c.slug}`} className="w-full hover:opacity-90">
 
                   {/* サムネイル */}
-                  <div className={`w-full ${ASPECT.MAP_CARD} bg-ananta-surface flex items-center justify-center`}>
-                    <img
+                  <div className={`relative w-full ${ASPECT.MAP_CARD} bg-ananta-surface flex items-center justify-center`}>
+                    <AppImage
                       src={c.image_url || "/noimage.png"}
                       alt={c.name}
-                      className="w-full h-full object-cover rounded-sm"
+                      fill
+                      sizes="(max-width: 768px) 100vw, 50vw"
+                      className="object-cover rounded-sm"
                     />
                   </div>
 

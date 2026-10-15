@@ -1,7 +1,11 @@
 // src/actions/makeCrudActions.ts
 import "server-only";
+import { revalidatePath } from "next/cache";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin"; // server-only helper
+import { createSupabaseServerClient } from "@/lib/supabase/server"; // server-only helper
 import { generateSlug } from "@/lib/utils/generate-slug"; // slug 生成ユーティリティ
+import { getAdminUser } from "@/lib/auth/require-admin";
+import { parseAdminPayload } from "@/lib/validation/admin-payload";
 
 export type CrudActions<T> = {
   list: (opts?: any) => Promise<{ items: T[]; total?: number }>;
@@ -29,9 +33,11 @@ export function makeCrudActions<T extends Record<string, any>>(
     sourceField?: string; // default "name"
     slugify?: (s: string) => string; // default generateSlug
     overwriteSlugOnUpdate?: boolean; // update 時に slug を上書きするか
+    publicCreate?: boolean; // true の場合のみ、認証なしで create を許可する（公開コメントなど）
   }
 ): CrudActions<T> {
-  const supabase = createSupabaseAdminClient();
+  const writedb = createSupabaseAdminClient();
+  const readdb = createSupabaseServerClient();
 
   // オプションのデフォルト（create 内にローカル定義することも可能だが、
   // ここに置くと makeCrudActions の他のメソッドでも参照しやすい）
@@ -75,7 +81,7 @@ export function makeCrudActions<T extends Record<string, any>>(
     const to = page * pageSize - 1;
     const like = `%${q}%`;
 
-    let query = supabase.from(table).select("*", { count: includeCount ? "exact" : undefined });
+    let query = readdb.from(table).select("*", { count: includeCount ? "exact" : undefined });
 
     if (filters && typeof filters === "object" && !Array.isArray(filters)) {
       Object.entries(filters).forEach(([k, v]) => {
@@ -119,13 +125,13 @@ export function makeCrudActions<T extends Record<string, any>>(
   }
 
   async function getById(id: string) {
-    const { data, error } = await supabase.from(table).select("*").eq("id", id).single();
+    const { data, error } = await readdb.from(table).select("*").eq("id", id).single();
     if (error && error.code !== "PGRST116") throw error;
     return (data ?? null) as T | null;
   }
 
   async function getBySlug(slug: string) {
-    const { data, error } = await supabase.from(table).select("*").eq("slug", slug).single();
+    const { data, error } = await readdb.from(table).select("*").eq("slug", slug).single();
     if (error && error.code !== "PGRST116") throw error;
     return (data ?? null) as T | null;
   }
@@ -136,14 +142,15 @@ export function makeCrudActions<T extends Record<string, any>>(
    * - 挿入は一度だけ行い、UNIQUE 制約違反が返ったらエラーをそのまま投げる
    */
   async function create(payload: Partial<T>) {
-    const row = payload as Record<string, unknown>;
+    if (!opts?.publicCreate) await getAdminUser(); // 書き込みは管理者のみ
+    const row = parseAdminPayload(table, payload, "create");
 
     if (slugField) {
       let slug = (row[slugField] as string) ?? "";
       if (!slug && row[sourceField]) {
-        slug = slugify(String(row[sourceField]));
+        slug = await slugify(String(row[sourceField]));
       } else if (slug) {
-        slug = slugify(String(slug));
+        slug = await slugify(String(slug));
       }
 
       if (slug) {
@@ -151,7 +158,7 @@ export function makeCrudActions<T extends Record<string, any>>(
       }
     }
 
-    const { data, error } = await supabase.from(table).insert<Record<string, unknown>>([row]).select().single();
+    const { data, error } = await writedb.from(table).insert<Record<string, unknown>>([row]).select().single();
 
     if (error) {
       const isUniqueViolation =
@@ -167,27 +174,32 @@ export function makeCrudActions<T extends Record<string, any>>(
       throw error;
     }
 
+    revalidatePath("/", "layout");
     return data as T;
   }
 
   async function update(id: string, payload: Partial<T>) {
-    const row = payload as Record<string, unknown>;
+    await getAdminUser(); // 書き込みは管理者のみ
+    const row = parseAdminPayload(table, payload, "update");
 
     if (slugField && overwriteSlugOnUpdate) {
-      let slug = row[slugField] ? String(row[slugField]) : row[sourceField] ? slugify(String(row[sourceField]) ?? "") : "";
+      let slug = await (row[slugField] ? String(row[slugField]) : row[sourceField] ? slugify(String(row[sourceField]) ?? "") : "");
       if (slug) {
         row[slugField] = slugify(slug);
       }
     }
 
-    const { data, error } = await supabase.from(table).update<Record<string, unknown>>(row).eq("id", id).select().single();
+    const { data, error } = await writedb.from(table).update<Record<string, unknown>>(row).eq("id", id).select().single();
     if (error) throw error;
+    revalidatePath("/", "layout");
     return data as T;
   }
 
   async function remove(id: string) {
-    const { error } = await supabase.from(table).delete().eq("id", id);
+    await getAdminUser(); // 書き込みは管理者のみ
+    const { error } = await writedb.from(table).delete().eq("id", id);
     if (error) throw error;
+    revalidatePath("/", "layout");
   }
 
   return { list, getById, getBySlug, create, update, remove };

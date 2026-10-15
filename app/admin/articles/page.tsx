@@ -1,3 +1,4 @@
+import { requireAdminPage } from "@/lib/auth/require-admin";
 // app/admin/articles/page.tsx（認証なし版）
 
 import { getArticleList } from "@/actions/articles-actions-server";
@@ -5,6 +6,7 @@ import DataTable, { Column } from "@/components/admin/data-table";
 import { SiteShell } from "@/components/layout/site-shell";
 
 export default async function Page({ searchParams }: { searchParams: any }) {
+  await requireAdminPage();
     const params = await searchParams;
     const page = Number(params?.page ?? 1);
     const perPage = Number(params?.perPage ?? 20);

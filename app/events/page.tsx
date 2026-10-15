@@ -7,6 +7,7 @@ import { SiteShell } from "@/components/layout/site-shell"
 import { getEventList } from "@/actions/events-actions-server"
 import { buildEntityUrl } from "@/lib/utils/url-utils"
 import Link from "next/link"
+import { AppImage } from "@/components/app-image"
 
 export default async function EventsPage() {
 
@@ -48,9 +49,11 @@ export default async function EventsPage() {
 
                                         <div className="flex items-center gap-2">
                                             {/* 画像 */}
-                                            <img
+                                            <AppImage
                                                 src={ev.image_url || "/noimage.png"}
                                                 alt={ev.title}
+                                                width={64}
+                                                height={64}
                                                 className="wsize-4 shrink-0 text-ananta-muted object-cover rounded-sm"
                                             />
                                             {/* テキスト */}
@@ -84,9 +87,11 @@ export default async function EventsPage() {
 
                                         <div className="flex items-center gap-2">
                                             {/* 画像 */}
-                                            <img
+                                            <AppImage
                                                 src={ev.image_url || "/noimage.png"}
                                                 alt={ev.title}
+                                                width={64}
+                                                height={64}
                                                 className="wsize-4 shrink-0 text-ananta-muted object-cover rounded-sm"
                                             />
                                             {/* テキスト */}

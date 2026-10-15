@@ -1,10 +1,12 @@
 // app/api/comments/route.ts
 import "server-only";
+import { isIP } from "node:net";
+import { ipAddress } from "@vercel/functions";
 import { z } from "zod";
 import sanitizeHtml from "sanitize-html";
 import { NextResponse } from "next/server";
 import { createCommentFromObject } from "@/actions/comments-actions-server"; // createCommentFromObject を置いたファイルパスに合わせてください
-import { isRateLimited } from "@/lib/comments/rate-limit";
+import { hashClientIp, isRateLimited, RateLimitUnavailableError } from "@/lib/comments/rate-limit";
 
 const BodySchema = z.object({
   page_id: z.string().min(1),
@@ -14,14 +16,30 @@ const BodySchema = z.object({
 });
 
 export async function POST(req: Request) {
-  try {
-    const ip = req.headers.get("x-forwarded-for") ?? req.headers.get("x-real-ip") ?? "unknown";
+  const forwardedIp = ipAddress(req);
+  const ip = forwardedIp && isIP(forwardedIp)
+    ? forwardedIp
+    : process.env.NODE_ENV === "development"
+      ? "127.0.0.1"
+      : null;
 
-    // レート制限（非同期対応）
-    if (await isRateLimited(`comments:${ip}`)) {
+  if (!ip) {
+    return NextResponse.json({ error: "client_ip_unavailable" }, { status: 503 });
+  }
+
+  try {
+    if (await isRateLimited(ip)) {
       return NextResponse.json({ error: "rate_limited" }, { status: 429 });
     }
+  } catch (err) {
+    console.error("Comment rate limiter unavailable", err);
+    return NextResponse.json(
+      { error: err instanceof RateLimitUnavailableError ? "rate_limit_not_configured" : "rate_limit_unavailable" },
+      { status: 503 },
+    );
+  }
 
+  try {
     const payload = await req.json();
     const parsed = BodySchema.safeParse(payload);
     if (!parsed.success) {
@@ -40,7 +58,7 @@ export async function POST(req: Request) {
       user_name: cleanName,
       content: cleanContent,
       parent_id: parent_id ?? null,
-      ip,
+      ip: hashClientIp(ip),
     });
 
     if (!res || !res.success) {

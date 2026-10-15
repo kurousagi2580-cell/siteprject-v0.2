@@ -1,13 +1,14 @@
 
 import "server-only";
 import { NextResponse } from "next/server";
+import { guardAdmin } from "@/lib/auth/require-admin";
 import { sanitizePayload } from "@/lib/utils/sanitize-ids"
 import { createEntityWithPage } from "@/lib/supabase/queries/index"; // server-only helper
-//import { requireAdmin } from "@/auth/require-admin";
 
 export async function POST(req: Request) {
+  const denied = await guardAdmin();
+  if (denied) return denied;
   try {
-    //await requireAdmin();
     const payload = sanitizePayload(await req.json());
     const result = await createEntityWithPage("character", payload);
     return NextResponse.json({ success: true, result: result });

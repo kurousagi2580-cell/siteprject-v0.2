@@ -1,8 +1,10 @@
+import { requireAdminPage } from "@/lib/auth/require-admin";
 import RegionForm from "@/components/entities/region/region-form"
 import { getRegionById } from "@/actions/regions-actions-server";
 import { getCountryList } from "@/actions/countries-actions-server";
 
 export default async function Page({ params }: { params: Promise<{ id: string }> }) {
+  await requireAdminPage();
   const { id } = await params
 
   const cotRes = await getCountryList();

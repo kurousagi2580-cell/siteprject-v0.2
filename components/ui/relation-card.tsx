@@ -1,4 +1,5 @@
 import Link from "next/link"
+import { AppImage } from "@/components/app-image"
 import { CardBox } from "@/components/ui/card-box"
 import type { MergedRelation } from "@/types/relationships"
 
@@ -8,14 +9,17 @@ export function RelationCard({ relation }: { relation: MergedRelation }) {
 
   return (
     <CardBox className="flex flex-col items-center p-3">
-      <img
+      <AppImage
         src={
           partner?.image_url && partner.image_url.trim() !== ""
             ? partner.image_url
             : "/noimage.png"
         }
         alt={partner?.name ?? "no name"}
-        className="w-full object-cover rounded-sm"
+        width={400}
+        height={300}
+        sizes="(max-width: 768px) 100vw, 300px"
+        className="w-full aspect-[4/3] object-cover rounded-sm"
       />
 
       {partner ? (

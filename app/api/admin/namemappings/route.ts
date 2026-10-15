@@ -1,15 +1,14 @@
 // src/app/api/articles/route.ts
 import "server-only";
 import { NextResponse } from "next/server";
-import { createNameMappingsFromObject, updateNameMappingsFromObject, deleteNameMappings, getNameMappingsById } from "@/actions/namemaps-actions-server";
+import { guardAdmin } from "@/lib/auth/require-admin";
+import { createNameMappingsFromObject } from "@/actions/namemaps-actions-server";
 import { sanitizePayload } from "@/lib/utils/sanitize-ids";
 import { clearNameMapCache } from "@/lib/supabase/queries/name-maps";
-// import { requireAdmin } from "@/auth/require-admin"; // 必要なら有効化
 
 export async function POST(req: Request) {
-  // 管理者チェックを入れる場合（コメント解除して実装）
-  // const admin = await requireAdmin(req);
-  // if (!admin) return NextResponse.json({ success: false, error: "unauthorized" }, { status: 401 });
+  const denied = await guardAdmin();
+  if (denied) return denied;
 
   try {
     const payload = await req.json();
@@ -42,33 +41,4 @@ export async function POST(req: Request) {
     console.error("articles POST error:", err);
     return NextResponse.json({ success: false, error: "server_error", detail: String(err?.message ?? err) }, { status: 500 });
   }
-}
-
-export async function GET(req: Request, { params }: { params: { id: string } }) {
-  //await requireAdmin();
-  const { id } = await params;
-  if (!id) return NextResponse.json({ success: false, error: "missing id" }, { status: 400 });
-  const item = await getNameMappingsById(id);
-  if (!item) return NextResponse.json({ success: false, error: "not found" }, { status: 404 });
-  return NextResponse.json({ success: true, item });
-}
-
-export async function PUT(req: Request, { params }: { params: { id: string } }) {
-  //wait requireAdmin();
-  const { id } = await params;
-  if (!id) return NextResponse.json({ success: false, error: "missing id" }, { status: 400 });
-  const payload = await req.json();
-  const sanitized = sanitizePayload(payload);
-  const res = await updateNameMappingsFromObject(id, sanitized);
-  clearNameMapCache()
-  return NextResponse.json(res);
-}
-
-export async function DELETE(req: Request, { params }: { params: { id: string } }) {
-  //await requireAdmin();
-  const { id } = await params;
-  if (!id) return NextResponse.json({ success: false, error: "missing id" }, { status: 400 });
-  const res = await deleteNameMappings(id);
-  clearNameMapCache()
-  return NextResponse.json(res);
 }

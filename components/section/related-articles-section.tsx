@@ -1,5 +1,6 @@
 // components/section/related-articles-section.tsx
 import { LinkCardBox } from "@/components/ui/link-card-box"
+import { AppImage } from "@/components/app-image"
 import { CardPanel } from "@/components/ui/card-panel"
 import { GameSectionTitle } from "@/components/ui/game-section-title"
 import { Section } from "@/components/ui/section"
@@ -32,11 +33,15 @@ export function RelatedArticlesSection({
                 className="flex flex-col"
               >
                 {/* アイキャッチ */}
-                <img
-                  src={a.eyecatch || "/noimage.png"}
-                  alt={a.title ?? ""}
-                  className="w-full object-cover rounded-sm"
-                />
+                <div className="relative aspect-video w-full">
+                  <AppImage
+                    src={a.eyecatch || "/noimage.png"}
+                    alt={a.title ?? ""}
+                    fill
+                    sizes="(max-width: 768px) 100vw, 50vw"
+                    className="object-cover rounded-sm"
+                  />
+                </div>
 
                 {/* タイトル */}
                 <p className="font-bold text-ananta-text">{a.title}</p>

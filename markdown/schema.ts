@@ -15,7 +15,7 @@ const schema: Schema = {
   ],
   attributes: {
     // schema.attributes の "*": [...]
-    "*": ["className", "id", "title", "aria-hidden", "role", "data-video-id", "data-tweet-id", "data-tweet-url"]
+    "*": ["className", "id", "title", "aria-hidden", "role", "data-video-id", "data-tweet-id"]
     ,
     a: ["href", "title", "rel", "target"],
     img: ["src", "alt", "title", "width", "height", "loading"],

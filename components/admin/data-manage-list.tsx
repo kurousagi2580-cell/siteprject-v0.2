@@ -1,4 +1,5 @@
 "use client";
+import { AppImage } from "@/components/app-image"
 import { LinkCardBox } from "@/components/ui/link-card-box"
 import Link from "next/link"
 
@@ -21,9 +22,12 @@ export default function DataManageList<T>({
       {items.map((item: any) => (
         <div key={item.id} className="relative">
           <LinkCardBox href={`${hrefBase}/${item.id}`} className="hover:opacity-90 flex flex-col items-center">
-            <img
+            <AppImage
               src={!item[imageKey] || item[imageKey] === "" ? "/noimage.png" : item[imageKey]}
               alt={String(item[nameKey] ?? "")}
+              width={400}
+              height={400}
+              sizes="(max-width: 640px) 50vw, 20vw"
               className="w-full aspect-square object-cover rounded-sm"
             />
             <p className="mt-2 text-center text-sm font-bold text-ananta-text">{item[nameKey]}</p>

@@ -6,9 +6,10 @@ __v0_jsx-dev-runtime.ts
 .v0-trash/
 .vercel/
 
-# Environment variables
+# Environment variables（絶対にコミットしない）
 .env
-.env*.local
+.env.*
+!.env.example
 
 # Next.js build output
 .next/

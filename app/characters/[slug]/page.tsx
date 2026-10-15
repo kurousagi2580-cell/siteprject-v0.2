@@ -6,11 +6,12 @@ import { Surface } from "@/components/ui/surface"
 import { getPageBySlug } from "@/actions/pages-actions-server"
 import { getArticleListByPage } from "@/actions/articles-actions-server"
 import { getCharacterDetail } from "@/lib/supabase/queries/characters"
-import { mergeRelations } from "@/lib/characters/merg-character-relation"
+import { mergeRelations } from "@/lib/characters/merge-character-relation"
 import { ProfileSection } from "@/components/section/profile-section"
 import { SkillsSection } from "@/components/section/skills-section"
 import { RelationsSection } from "@/components/section/relations-section"
 import { RelatedArticlesSection } from "@/components/section/related-articles-section"
+import { unstable_rethrow } from "next/navigation"
 
 export default async function CharacterDetailPage({
   params,
@@ -20,13 +21,14 @@ export default async function CharacterDetailPage({
   const { slug } = await params
 
   try {
-    const page = await getPageBySlug(slug)
+    const [page, character] = await Promise.all([
+      getPageBySlug(slug),
+      getCharacterDetail(slug),
+    ])
 
     if (!page) notFound()
 
     const relatedArticle = (await getArticleListByPage(page.id)).items
-
-    const character = await getCharacterDetail(slug)
 
     if (!character || null) notFound()
 
@@ -60,9 +62,8 @@ export default async function CharacterDetailPage({
       </SiteShell>
     )
   } catch (err) {
-    // サーバー側ログに詳細を出す
-    console.error("CharacterDetailPage DB error:", err);
-    // ユーザー向けは汎用メッセージ
-    return <div>データの取得中にエラーが発生しました。</div>;
+    unstable_rethrow(err)          // notFound / redirect は再 throw
+    console.error("CharacterDetailPage DB error:", err)
+    throw err                      // app/error.tsx に任せる
   }
 }

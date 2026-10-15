@@ -1,5 +1,6 @@
 import Link from "next/link"
 import { notFound } from "next/navigation"
+import { AppImage } from "@/components/app-image"
 import { FileText } from "lucide-react"
 import { SiteShell } from "@/components/layout/site-shell"
 import CommentSection from "@/components/section/comment-section";
@@ -45,11 +46,13 @@ if (!page) notFound();
     <SiteShell pageNavItems={pageNavItems} rightNavMode="nav">
 
       {/* Eyecatch */}
-      <CardBox className="h-52 md:h-72 flex items-center justify-center">
-        <img
+      <CardBox className="relative h-52 md:h-72 flex items-center justify-center overflow-hidden">
+        <AppImage
           src={region.image_url || "/noimage.png"}
           alt={region.name}
-          className="w-full object-cover rounded-sm"
+          fill
+          sizes="(max-width: 768px) 100vw, 75vw"
+          className="object-cover rounded-sm"
         />
       </CardBox>
 

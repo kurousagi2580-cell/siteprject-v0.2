@@ -13,7 +13,10 @@ export function YouTubeEmbed({
     <div style={{ width: "100%", maxWidth: "640px" }}>
       <div style={{ position: "relative", paddingBottom: `${padding}%`, height: 0 }}>
         <iframe
-          src={`https://www.youtube.com/embed/${videoId}`}
+          src={`https://www.youtube-nocookie.com/embed/${videoId}`}
+          title={`YouTube video ${videoId}`}
+          loading="lazy"
+          referrerPolicy="strict-origin-when-cross-origin"
           allowFullScreen
           style={{
             position: "absolute",

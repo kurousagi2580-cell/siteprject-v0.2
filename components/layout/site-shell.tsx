@@ -71,7 +71,7 @@ export function SiteShell({
       {/* Layout */}
       <div className="mx-auto flex max-w-[1440px] gap-6 px-4 py-4">
         {/* Sidebar */}
-        <aside className="hidden md:block w-40 shrink-0 self-start sticky top-20 rounded bg-ananta-surface/50 backdrop-blur-lg border border-ananta-border/40 shadow-[inset_0_0_20px_rgba(0,0,0,0.5)] p-4">
+        <aside className="hidden md:block w-40 shrink-0 self-start sticky top-20 rounded bg-ananta-surface/50 backdrop-blur-lg border border-ananta-border/40 p-4">
           <SidebarNav />
         </aside>
 

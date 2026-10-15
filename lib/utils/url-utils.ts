@@ -1,4 +1,4 @@
-
+import type { LatestComment } from "@/types/comment"
 
 //TOPぺージでの変換
 export function resolvePageUrl(page: LatestComment["page"]) {
@@ -7,10 +7,10 @@ export function resolvePageUrl(page: LatestComment["page"]) {
       return `/countries/${page.slug}`
     case "character":
       return `/characters/${page.slug}`
-    case "map":
-      return `/maps/${page.slug}`
+    case "region":
+      return `/regions/${page.slug}`
     default:
-      return `/pages/${page.slug}`
+      return `/articles/${page.slug}`
   }
 }
 

@@ -1,6 +1,6 @@
 "use client"
 
-import { Pagination } from "./pagenation"
+import { Pagination } from "./pagination"
 
 type CategorySectionProps<T> = {
   title: string

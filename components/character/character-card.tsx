@@ -1,5 +1,6 @@
 
 import { LinkCardBox } from "@/components/ui/link-card-box"
+import { AppImage } from "@/components/app-image"
 import type { CharacterJoinAffiliation } from "@/types/character"
 import { ASPECT } from "@/lib/image-aspect"
 
@@ -11,11 +12,13 @@ export function CharacterCard({ character }: { character: CharacterJoinAffiliati
       className="w-full hover:opacity-90"
     >
       {/* 親は高さを持たない */}
-      <div className="w-full bg-ananta-surface rounded-sm overflow-hidden">
-        <img
+      <div className={`relative w-full ${ASPECT.CHARACTER_CARD} bg-ananta-surface rounded-sm overflow-hidden`}>
+        <AppImage
           src={character.image_url || "/noimage.png"}
           alt={character.short_name ?? ""}
-          className={`w-full ${ASPECT.CHARACTER_CARD} object-cover`}
+          fill
+          sizes="(max-width: 768px) 50vw, 25vw"
+          className="object-cover"
         />
       </div>
 
@@ -27,4 +30,3 @@ export function CharacterCard({ character }: { character: CharacterJoinAffiliati
     </LinkCardBox>
   )
 }
-

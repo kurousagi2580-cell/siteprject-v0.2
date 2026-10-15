@@ -2,6 +2,7 @@
 import "server-only";
 import { makeCrudActions } from "@/actions/make-crud-actions";
 import type { Article } from "@/types/article";
+import { items } from "@/lib/data";
 
 const actions = makeCrudActions<Article>("articles", "title", {slugField: "slug", sourceField: "title"});
 
@@ -27,7 +28,7 @@ export async function getArticleById(id: string) {
 }
 
 export async function getArticleBySlug(slug: string) {
-  return await actions.getById(slug);
+  return await actions.getBySlug(slug);
 }
 
 export async function getArticleList(opts?: { page?: number; pageSize?: number }) {
@@ -41,16 +42,7 @@ export async function getArticleList(opts?: { page?: number; pageSize?: number }
     order: "desc",
   });
 
-  // 必要ならシリアライズ
-  const items = (result.items ?? []).map((r) => ({
-    id: r.id,
-    title: r.title,
-    body: r.body,
-    created_at: r.created_at ? new Date(r.created_at).toISOString() : null,
-    updated_at: r.updated_at ? new Date(r.updated_at).toISOString() : null,
-  }));
-
-  return { items, total: result.total ?? 0, page, pageSize };
+  return { items:result.items, total: result.total ?? 0, page, pageSize };
 }
 
 export async function getArticleListByPage(page_id: string, opts?: { page?: number; pageSize?: number }) {
@@ -68,14 +60,5 @@ export async function getArticleListByPage(page_id: string, opts?: { page?: numb
     order: "desc",
   });
 
-  // 必要ならシリアライズ
-  const items = (result.items ?? []).map((r) => ({
-    id: r.id,
-    title: r.title,
-    body: r.body,
-    created_at: r.created_at ? new Date(r.created_at).toISOString() : null,
-    updated_at: r.updated_at ? new Date(r.updated_at).toISOString() : null,
-  }));
-
-  return { items, total: result.total ?? 0, page, pageSize };
+  return { items:result.items, total: result.total ?? 0, page, pageSize };
 }

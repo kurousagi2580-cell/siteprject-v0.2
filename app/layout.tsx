@@ -2,10 +2,25 @@ import { Analytics } from '@vercel/analytics/next'
 import type { Metadata, Viewport } from 'next'
 import './globals.css'
 
+export const revalidate = 60
+
 export const metadata: Metadata = {
-  title: 'Ananta Database',
+  title: {
+    default: 'Ananta Database',
+    template: '%s | Ananta Database',
+  },
   description: '無限大ANANTAの攻略情報・データベース',
   generator: 'v0.app',
+  openGraph: {
+    title: 'Ananta Database',
+    description: '無限大ANANTAの攻略情報・データベース',
+    siteName: 'Ananta Database',
+    locale: 'ja_JP',
+    type: 'website',
+  },
+  twitter: {
+    card: 'summary',
+  },
   icons: {
     icon: [
       { url: '/icon-light-32x32.png', media: '(prefers-color-scheme: light)' },

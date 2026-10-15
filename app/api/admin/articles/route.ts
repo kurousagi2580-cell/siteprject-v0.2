@@ -1,11 +1,13 @@
 
 import "server-only";
 import { NextResponse } from "next/server";
+import { guardAdmin } from "@/lib/auth/require-admin";
 import { createArticleFromObject } from "@/actions/articles-actions-server";
 import { sanitizePayload } from "@/lib/utils/sanitize-ids"
-//import { requireAdmin } from "@/auth/require-admin";s
 
 export async function POST(req: Request) {
+  const denied = await guardAdmin();
+  if (denied) return denied;
 
   const payload = await req.json();
     const sanitized = sanitizePayload(payload);

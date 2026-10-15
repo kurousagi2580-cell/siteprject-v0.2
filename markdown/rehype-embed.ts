@@ -2,7 +2,7 @@
 import { visit } from "unist-util-visit";
 import type { Root, Element } from "hast";
 
-const YT_REGEX = /^(?:https?:\/\/)?(?:www\.)?(?:youtube\.com\/watch\?v=|youtu\.be\/)([A-Za-z0-9_-]{6,})/i;
+const YT_REGEX = /^(?:https?:\/\/)?(?:www\.)?(?:youtube\.com\/watch\?v=|youtu\.be\/)([A-Za-z0-9_-]{11})/i;
 const X_REGEX = /^(?:https?:\/\/)?(?:www\.)?(?:x\.com|twitter\.com)\/[^\/\s]+\/status\/(\d+)/i;
 
 /**
@@ -47,7 +47,7 @@ export default function rehypeEmbed() {
                     const el: Element = {
                         type: "element",
                         tagName: "div",
-                        properties: { className: ["embed-x"], "data-tweet-id": tweetId, "data-tweet-url": cleaned },
+                        properties: { className: ["embed-x"], "data-tweet-id": tweetId },
                         children: []
                     };
                     if (parent && typeof index === "number") parent.children.splice(index, 1, el);
@@ -80,7 +80,7 @@ export default function rehypeEmbed() {
                     const el: Element = {
                         type: "element",
                         tagName: "div",
-                        properties: { className: ["embed-x"], "data-tweet-id": tweetId, "data-tweet-url": cleaned },
+                        properties: { className: ["embed-x"], "data-tweet-id": tweetId },
                         children: []
                     };
                     if (parent && typeof index === "number") parent.children.splice(index, 1, el);

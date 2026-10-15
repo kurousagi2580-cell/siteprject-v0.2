@@ -1,5 +1,6 @@
 "use client"
 
+import { AppImage } from "@/components/app-image"
 import { TransformWrapper, TransformComponent } from "react-zoom-pan-pinch"
 
 interface ZoomableMapProps {
@@ -19,9 +20,13 @@ export function ZoomableMap({ src, className }: ZoomableMapProps) {
         doubleClick={{ disabled: true }}
       >
         <TransformComponent>
-          <img
+          <AppImage
             src={src}
             alt="map"
+            width={1600}
+            height={900}
+            sizes="100vw"
+            style={{ aspectRatio: "auto" }}
             className="w-full h-auto select-none"
           />
         </TransformComponent>
