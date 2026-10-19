@@ -33,6 +33,7 @@ export function makeCrudActions<T extends Record<string, any>>(
     sourceField?: string; // default "name"
     slugify?: (s: string) => string; // default generateSlug
     overwriteSlugOnUpdate?: boolean; // update 時に slug を上書きするか
+    normalizeSlugOnUpdate?: boolean; // update 時に入力された slug のみを正規化する
     publicCreate?: boolean; // true の場合のみ、認証なしで create を許可する（公開コメントなど）
   }
 ): CrudActions<T> {
@@ -180,7 +181,28 @@ export function makeCrudActions<T extends Record<string, any>>(
 
   async function update(id: string, payload: Partial<T>) {
     await getAdminUser(); // 書き込みは管理者のみ
-    const row = parseAdminPayload(table, payload, "update");
+    const updatePayload = { ...payload } as Record<string, unknown>;
+
+    if (
+      slugField &&
+      opts?.normalizeSlugOnUpdate &&
+      typeof updatePayload[slugField] === "string"
+    ) {
+      const inputSlug = updatePayload[slugField] as string;
+      const trimmedSlug = inputSlug.trim();
+      const normalizedSlug = !trimmedSlug
+        ? ""
+        : /^(?:[a-z0-9]+(?:-[a-z0-9]+)*)$/.test(trimmedSlug)
+          ? trimmedSlug
+          : await slugify(trimmedSlug);
+      if (normalizedSlug) {
+        updatePayload[slugField] = normalizedSlug;
+      } else {
+        delete updatePayload[slugField];
+      }
+    }
+
+    const row = parseAdminPayload(table, updatePayload, "update");
 
     if (slugField && overwriteSlugOnUpdate) {
       let slug = await (row[slugField] ? String(row[slugField]) : row[sourceField] ? slugify(String(row[sourceField]) ?? "") : "");

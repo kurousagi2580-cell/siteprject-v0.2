@@ -1,28 +1,51 @@
+
+type GameSectionTitleProps = {
+  title: string
+  subtitle?: string
+  layout?: "vertical" | "horizontal"
+}
+
 export function GameSectionTitle({
   title,
   subtitle,
-}: {
-  title: string
-  subtitle?: string
-}) {
-  return (
-    <div className="flex gap-3">
-
-      {/* 縦バー：高さ固定 */}
-      <div className="w-1 bg-ananta-accent rounded-sm h-full min-h-[20px]" />
-
-      <div className="flex flex-col">
-        <h2 className="text-lg font-bold leading-none">
+  layout = "vertical",
+}: GameSectionTitleProps) {
+  if (layout === "horizontal") {
+    return (
+      <div className="mb-4 flex min-w-0 items-center gap-x-3 gap-y-1 border-b border-ananta-border/50 pb-3">
+        <span
+          aria-hidden="true"
+          className="h-5 w-1 shrink-0 rounded-sm bg-ananta-accent"
+        />
+        <h2 className="text-base font-bold tracking-[0.12em] text-ananta-text sm:text-lg">
           {title}
         </h2>
-
         {subtitle && (
-          <p className="text-sm text-ananta-muted leading-tight mt-1">
+          <span className="min-w-0 text-xs text-ananta-muted sm:text-sm">
             {subtitle}
-          </p>
+          </span>
         )}
       </div>
+    )
+  }
 
+  return (
+    <div className="mb-4 border-b border-ananta-border/50 pb-3">
+      <div className="flex items-center gap-3">
+        <span
+          aria-hidden="true"
+          className="h-5 w-1 shrink-0 rounded-sm bg-ananta-accent"
+        />
+        <h2 className="text-base font-bold tracking-[0.12em] text-ananta-text sm:text-lg">
+          {title}
+        </h2>
+      </div>
+
+      {subtitle && (
+        <p className="mt-2 pl-4 text-xs leading-relaxed text-ananta-muted sm:text-sm">
+          {subtitle}
+        </p>
+      )}
     </div>
   )
 }

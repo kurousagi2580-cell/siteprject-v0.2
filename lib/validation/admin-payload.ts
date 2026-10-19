@@ -45,6 +45,7 @@ const schemas = {
   articles: z.object({
     title: requiredText(300),
     ...commonEntityFields,
+    slug: z.string().max(120).nullable().optional(),
     eyecatch: url,
     body: text(100_000),
     category: text(100),

@@ -5,8 +5,8 @@ import React, { useMemo, useState } from "react";
 import FormLayout, { FormResult } from "./form-layout";
 import { SchemaField, renderInput } from "./file-renderes";
 import { denormalizeDotKeys } from "@/lib/utils/denormalize-dot";
-import dynamic from "next/dynamic";
 import { MarkdownPreview } from "./markdown-preview";
+import { MarkdownEditor } from "./markdown-editor";
 
 export type EntityFormProps = {
   title?: string;
@@ -19,6 +19,9 @@ export type EntityFormProps = {
   submitLabel?: string;
   className?: string;
   enablePreview?: boolean;
+  markdownEditorLayout?: "inline" | "tabbed";
+  viewportLayout?: boolean;
+  onSuccess?: () => void;
 };
 
 export default function EntityForm({
@@ -32,6 +35,9 @@ export default function EntityForm({
   submitLabel,
   className,
   enablePreview = false,
+  markdownEditorLayout = "inline",
+  viewportLayout = false,
+  onSuccess,
 }: EntityFormProps) {
   const initialState = useMemo(() => {
     const s: Record<string, any> = {};
@@ -42,9 +48,45 @@ export default function EntityForm({
   }, [schema, initialData]);
 
   const [state, setState] = useState<Record<string, any>>(initialState);
+  const [activeTab, setActiveTab] = useState<"details" | "body">("details");
+  const markdownField = schema.find((field) => field.type === "markdown");
 
   function setField(k: string, v: any) {
     setState((s) => ({ ...s, [k]: v }));
+  }
+
+  function renderField(field: SchemaField) {
+    return (
+      <div
+        key={field.key}
+        className={
+          viewportLayout && field.type === "markdown"
+            ? "flex h-full min-h-0 flex-col gap-1"
+            : "flex flex-col gap-1"
+        }
+      >
+        <label className="text-sm text-ananta-muted">
+          {field.label ?? field.key}
+          {field.required ? " *" : ""}
+        </label>
+        {field.type === "markdown" && enablePreview ? (
+          <div className={`grid min-h-0 flex-1 grid-cols-1 gap-3 lg:grid-cols-2 ${viewportLayout ? "" : "min-h-96"}`}>
+            <div className="min-h-0">
+              <MarkdownEditor
+                value={String(state[field.key] ?? "")}
+                placeholder={field.placeholder}
+                onChange={(value) => setField(field.key, value)}
+              />
+            </div>
+            <div className={`prose prose-invert article-markdown min-h-0 overflow-auto rounded border border-ananta-border/40 bg-ananta-surface p-4 ${viewportLayout ? "h-full" : "min-h-96 max-h-[70vh]"}`}>
+              <MarkdownPreview source={String(state[field.key] ?? "")} />
+            </div>
+          </div>
+        ) : (
+          renderInput(field, state[field.key], (v) => setField(field.key, v))
+        )}
+      </div>
+    );
   }
 
   async function submitHandler(payloadFromLayout?: Record<string, any>) {
@@ -54,38 +96,90 @@ export default function EntityForm({
 
     const body = transformPayload ? await transformPayload(payload) : denormalizeDotKeys(payload);
 
+    let result: FormResult;
     if (mode === "create") {
       if (!onCreate) return { success: false, error: "onCreate is not provided" };
-      return onCreate(body);
+      result = await onCreate(body);
     } else {
       const id = (initialData as any)?.id;
       if (!id) return { success: false, error: "id is missing for update" };
       if (!onUpdate) return { success: false, error: "onUpdate is not provided" };
-      return onUpdate(String(id), body);
+      result = await onUpdate(String(id), body);
     }
+
+    if (result.success) onSuccess?.();
+    return result;
   }
 
   return (
-    <FormLayout title={title ?? (mode === "create" ? "新規作成" : "編集")} onSubmit={submitHandler} submitLabel={submitLabel} className={className}>
-      <div className="flex flex-col gap-6">
-        {schema.map((field) => (
-          <div key={field.key} className="flex flex-col gap-1">
-            <label className="text-sm text-ananta-muted">
-              {field.label ?? field.key}
-              {field.required ? " *" : ""}
-            </label>
-            {field.type === "markdown" && enablePreview ? (
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-                <div>{renderInput(field, state[field.key], (v) => setField(field.key, v))}</div>
-                <div className="prose max-h-96 overflow-auto p-4 border rounded bg-white">
-                  <MarkdownPreview source={String(state[field.key] ?? "")} />
-                </div>
-              </div>
-            ) : (
-              renderInput(field, state[field.key], (v) => setField(field.key, v))
-            )}
-          </div>
-        ))}
+    <FormLayout
+      title={title ?? (mode === "create" ? "新規作成" : "編集")}
+      onSubmit={submitHandler}
+      submitLabel={submitLabel}
+      className={className}
+      viewportLayout={viewportLayout}
+    >
+      <div className={`flex min-h-0 flex-col ${viewportLayout ? "h-full gap-2" : "gap-6"}`}>
+        {markdownEditorLayout === "tabbed" && markdownField ? (
+          <>
+            <div
+              role="tablist"
+              aria-label="記事入力項目"
+              className="flex shrink-0 gap-2 border-b border-ananta-border/50"
+            >
+              <button
+                id="article-details-tab"
+                type="button"
+                role="tab"
+                aria-selected={activeTab === "details"}
+                aria-controls="article-details-panel"
+                onClick={() => setActiveTab("details")}
+                className={`border-b-2 px-4 py-2 text-sm font-medium transition ${
+                  activeTab === "details"
+                    ? "border-ananta-accent text-ananta-text"
+                    : "border-transparent text-ananta-muted hover:text-ananta-text"
+                }`}
+              >
+                記事情報
+              </button>
+              <button
+                id="article-body-tab"
+                type="button"
+                role="tab"
+                aria-selected={activeTab === "body"}
+                aria-controls="article-body-panel"
+                onClick={() => setActiveTab("body")}
+                className={`border-b-2 px-4 py-2 text-sm font-medium transition ${
+                  activeTab === "body"
+                    ? "border-ananta-accent text-ananta-text"
+                    : "border-transparent text-ananta-muted hover:text-ananta-text"
+                }`}
+              >
+                本文
+              </button>
+            </div>
+            <div
+              id="article-details-panel"
+              role="tabpanel"
+              aria-labelledby="article-details-tab"
+              hidden={activeTab !== "details"}
+              className={`${activeTab === "details" ? "flex" : "hidden"} flex-col gap-6 ${viewportLayout ? "min-h-0 flex-1 overflow-y-auto py-2" : ""}`}
+            >
+              {schema.filter((field) => field.key !== markdownField.key).map(renderField)}
+            </div>
+            <div
+              id="article-body-panel"
+              role="tabpanel"
+              aria-labelledby="article-body-tab"
+              hidden={activeTab !== "body"}
+              className={`${activeTab === "body" ? "flex flex-col" : "hidden"} ${viewportLayout ? "min-h-0 flex-1 overflow-hidden pt-2" : ""}`}
+            >
+              {renderField(markdownField)}
+            </div>
+          </>
+        ) : (
+          schema.map(renderField)
+        )}
       </div>
     </FormLayout>
   );

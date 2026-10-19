@@ -21,6 +21,8 @@
 - `schema.ts` rehype サニタイズスキーマ
 - `headings.ts` remark を使った見出し抽出ユーティリティ
 - `render.ts` Markdown をサニタイズ済み HTML に変換するパイプライン
+- `EDITOR_GUIDE.md` 記事編集者向けMarkdown記法とエディターの使い方
+- `SAMPLE_ARTICLE.md` 記事プレビューと表示デザイン確認用のサンプル本文
 - `README.md` このファイル
 
 ---
@@ -57,6 +59,7 @@
 ---
 
 ### 編集者向けルール
+- 記事編集者向けの具体的な記法と入力例は [`EDITOR_GUIDE.md`](./EDITOR_GUIDE.md) を参照する。
 - raw HTML の使用は原則禁止。必要な埋め込みは指定の URL 形式で記述すること。  
 - 画像は https の外部 URL を推奨。data URI はサイズとセキュリティの観点から原則禁止。  
 - 許可される Markdown 機能  

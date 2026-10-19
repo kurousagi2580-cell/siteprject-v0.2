@@ -1,11 +1,11 @@
 // components/section/related-articles-section.tsx
-import { LinkCardBox } from "@/components/ui/link-card-box"
-import { AppImage } from "@/components/app-image"
+import { FileText } from "lucide-react"
 import { CardPanel } from "@/components/ui/card-panel"
 import { GameSectionTitle } from "@/components/ui/game-section-title"
 import { Section } from "@/components/ui/section"
 import { buildEntityUrl } from "@/lib/utils/url-utils"
 import type { Article } from "@/types/article"
+import Link from "next/link"
 
 export function RelatedArticlesSection({
   articles,
@@ -25,34 +25,24 @@ export function RelatedArticlesSection({
 
       <CardPanel>
         {articles.length ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <ul className="max-h-[196px] space-y-1 overflow-y-auto overscroll-contain text-sm">
             {articles.map((a) => (
-              <LinkCardBox
-                key={a.id}
-                href={buildEntityUrl(entityType, entitySlug, a.slug ?? "")}
-                className="flex flex-col"
-              >
-                {/* アイキャッチ */}
-                <div className="relative aspect-video w-full">
-                  <AppImage
-                    src={a.eyecatch || "/noimage.png"}
-                    alt={a.title ?? ""}
-                    fill
-                    sizes="(max-width: 768px) 100vw, 50vw"
-                    className="object-cover rounded-sm"
+              <li key={a.id}>
+                <Link
+                  href={buildEntityUrl(entityType, entitySlug, a.slug ?? "")}
+                  className="group flex min-h-9 items-center gap-2 rounded-md px-2 py-2 text-ananta-text no-underline transition-colors hover:bg-ananta-surface2/70 focus-visible:outline focus-visible:outline-2 focus-visible:outline-ananta-accent"
+                >
+                  <FileText
+                    aria-hidden="true"
+                    className="size-4 shrink-0 text-ananta-muted"
                   />
-                </div>
-
-                {/* タイトル */}
-                <p className="font-bold text-ananta-text">{a.title}</p>
-
-                {/* カテゴリ */}
-                <p className="text-ananta-muted text-xs">
-                  {a.category ?? "未分類"}
-                </p>
-              </LinkCardBox>
+                  <span className="min-w-0 flex-1 truncate font-medium group-hover:text-ananta-accent">
+                    {a.title}
+                  </span>
+                </Link>
+              </li>
             ))}
-          </div>
+          </ul>
         ) : (
           <p className="text-sm text-ananta-muted">関連記事なし</p>
         )}

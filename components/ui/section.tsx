@@ -5,10 +5,12 @@ export function Section({
   id,
   children,
   className,
+  contentClassName,
 }: {
   id?: string
   children: ReactNode
   className?: string
+  contentClassName?: string
 }) {
   return (
     <section className={cn("mt-6 mb-4", className)}>
@@ -16,7 +18,7 @@ export function Section({
       {id && <div id={id} className="scroll-mt-32"></div>}
 
       {/* 子要素の間に余白を付ける */}
-      <div className="space-y-4">
+      <div className={cn("space-y-4", contentClassName)}>
         {children}
       </div>
     </section>

@@ -4,7 +4,11 @@ import { makeCrudActions } from "@/actions/make-crud-actions";
 import type { Article } from "@/types/article";
 import { items } from "@/lib/data";
 
-const actions = makeCrudActions<Article>("articles", "title", {slugField: "slug", sourceField: "title"});
+const actions = makeCrudActions<Article>("articles", "title", {
+  slugField: "slug",
+  sourceField: "title",
+  normalizeSlugOnUpdate: true,
+});
 
 export async function createArticleFromObject(payload: Record<string, any>) {
   // 必要なサーバー側バリデーションをここで行う

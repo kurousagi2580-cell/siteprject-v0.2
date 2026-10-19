@@ -7,17 +7,34 @@ export const headerNav = [
   { label: "DATABASE", href: "/database" },
 ]
 
-export const sidebarNav = [
-  { label: "TOP", href: "/" },
-  { label: "Characters", href: "/characters" },
-  { label: "Maps", href: "/countries" },
-  //{ label: "Enemies", href: "/enemies" },
-  //{ label: "Items", href: "/items" },
-  //{ label: "Factions", href: "/world/factions" },
-  //{ label: "Search", href: "/database/search" },
-  //{ label: "Tags", href: "/database/tags" },
-  //{ label: "Pages", href: "/pages" },
-  { label: "Updates", href: "/updates" },
+export type SidebarNavItem = {
+  label: string
+  children: {
+    label: string
+    href: string
+  }[]
+}
+
+export const sidebarNav: SidebarNavItem[] = [
+  {
+    label: "キャラクター図鑑",
+    children: [
+      { label: "プレイアブル", href: "/aggregate/characters" },
+      { label: "NPC", href: "/aggregate/characters/npc" },
+      { label: "調査中", href: "/aggregate/characters/investigating" },
+    ],
+  },
+  {
+    label: "地理",
+    children: [
+      { label: "国一覧", href: "/aggregate/countries" },
+      { label: "地域一覧", href: "/aggregate/regions" },
+    ],
+  },
+  {
+    label: "世界観",
+    children: [
+      { label: "所属", href: "/aggregate/affiliations" },
+    ],
+  },
 ]
-
-

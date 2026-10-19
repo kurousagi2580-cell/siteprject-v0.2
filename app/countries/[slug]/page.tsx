@@ -42,6 +42,7 @@ export default async function RegionListPage({
           src={country.image_url || "/noimage.png"}
           alt={country.name}
           fill
+          loading="eager"
           sizes="(max-width: 768px) 100vw, 75vw"
           className="object-cover rounded-sm"
         />

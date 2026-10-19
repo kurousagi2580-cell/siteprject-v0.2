@@ -1,219 +1,56 @@
 import Link from "next/link"
-import { AppImage } from "@/components/app-image"
-import { FileText, MessageSquare } from "lucide-react"
+import { Map, Users, Globe2, type LucideIcon } from "lucide-react"
 import { SiteShell } from "@/components/layout/site-shell"
-import { pages } from "@/lib/data"
-import { LinkCardBox } from "@/components/ui/link-card-box"
-import { CardPanel } from "@/components/ui/card-panel"
-import { Surface } from "@/components/ui/surface"
-import { GameSectionTitle } from "@/components/ui/game-section-title"
-import { Section } from "@/components/ui/section"
-import { getLatestComments } from "@/lib/supabase/queries/comments"
-import { getCharacterByList } from "@/actions/characters-actions-server"
-import { getCountryList } from "@/actions/countries-actions-server"
-import { CharacterGrid } from "../components/character/character-grid"
-import { ASPECT } from "@/lib/image-aspect"
-import { resolvePageUrl } from "@/lib/utils/url-utils"
-import { toDateTimeString } from "@/lib/utils/toDate"
+import { sidebarNav } from "@/components/nav-items"
 
+const aggregateIcons: Record<string, LucideIcon> = {
+  キャラクター図鑑: Users,
+  地理: Map,
+  世界観: Globe2,
+}
 
-export default async function TopPage() {
-  const recommendedPages = pages.filter((p) => p.type === "recommend")
-
-  // ▼▼▼ DB から取得 ▼▼▼
-
-  const comments = await getLatestComments() ?? []
-
-  // ページごとに最新コメント1件だけ抽出
-  const latestByPage = new Map()
-  for (const c of comments) {
-    if (!latestByPage.has(c.page.id)) {
-      latestByPage.set(c.page.id, c)
-    }
-  }
-  const latestComments = Array.from(latestByPage.values()).slice(0, 5)
-
-  const characters = (await getCharacterByList()).items;
-
-  const countries = (await getCountryList()).items;
-
+export default function TopPage() {
   return (
     <SiteShell rightNavMode="none">
+      <header className="mb-4">
+        <h1 className="text-2xl font-bold tracking-wide text-ananta-text sm:text-3xl">
+          ANANTA DATABASEへようこそ
+        </h1>
+      </header>
 
-      {/* Eyecatch → Surface に統一 */}
-      <Surface variant="raised" className="h-52 md:h-64 flex items-center justify-center text-xl font-bold">
-        ANANTA DATABASE
-      </Surface>
+      <figure
+        aria-label="注目の画像"
+        className="flex aspect-[16/5] min-h-40 items-center justify-center overflow-hidden rounded-t-xl border border-dashed border-ananta-border bg-gradient-to-br from-ananta-surface2 via-ananta-surface to-ananta-surface2 sm:aspect-[16/4]"
+      >
+        <figcaption className="text-center">
+          <span className="block text-sm font-semibold text-ananta-text">注目の画像</span>
+          <span className="mt-1 block text-xs text-ananta-muted">画像は未設定です</span>
+        </figcaption>
+      </figure>
 
-      {/* EXPLORE */}
-      <Section id="explore">
-        <GameSectionTitle title="EXPLORE" subtitle="探索する" />
+      <section aria-label="データベース一覧">
+        <div className="grid grid-cols-3 overflow-hidden rounded-b-xl border-x border-b border-ananta-border/70 bg-ananta-surface2/80">
+          {sidebarNav.map((group) => {
+            const Icon = aggregateIcons[group.label] ?? Users
 
-        <div className="grid grid-cols-2 gap-4">
-          {/* 最新情報 */}
-          <Link
-            href="/news"
-            className="block rounded bg-ananta-surface2 border border-ananta-border px-4 py-6 text-center hover:bg-ananta-surface transition"
-          >
-            <p className="text-sm font-bold text-ananta-text">最新情報</p>
-          </Link>
-
-          {/* アップデート情報 */}
-          <Link
-            href="/updates"
-            className="block rounded bg-ananta-surface2 border border-ananta-border px-4 py-6 text-center hover:bg-ananta-surface transition"
-          >
-            <p className="text-sm font-bold text-ananta-text">アップデート</p>
-          </Link>
-
-          {/* イベント情報 */}
-          <Link
-            href="/events"
-            className="block rounded bg-ananta-surface2 border border-ananta-border px-4 py-6 text-center hover:bg-ananta-surface transition"
-          >
-            <p className="text-sm font-bold text-ananta-text">イベント</p>
-          </Link>
-
-          {/* お知らせ */}
-          <Link
-            href="/notices"
-            className="block rounded bg-ananta-surface2 border border-ananta-border px-4 py-6 text-center hover:bg-ananta-surface transition"
-          >
-            <p className="text-sm font-bold text-ananta-text">お知らせ</p>
-          </Link>
-        </div>
-      </Section>
-
-      {/* DISCOVER */}
-      <div className="mt-4 mb-4">
-        <GameSectionTitle
-          title="DISCOVER"
-          subtitle="キャラクター・マップを探索"
-        />
-      </div>
-
-      {/* キャラ一覧 → CardPanel + CardBox */}
-      <CardPanel className="mb-4">
-        <div className="mb-4">
-          <GameSectionTitle title="CHARACTERS" subtitle="キャラクター一覧" />
-        </div>
-
-        <CharacterGrid characters={characters} />
-      </CardPanel>
-
-      {/* マップ一覧 → CardPanel + CardBox */}
-      <CardPanel className="mb-4">
-        <div className="mb-4">
-          <GameSectionTitle title="MAPS" subtitle="マップ一覧" />
-        </div>
-
-        <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
-          {countries.map((m) => (
-
-            <LinkCardBox key={m.slug} href={`/countries/${m.slug}`} className="w-full hover:opacity-90">
-              <div className="relative w-full aspect-video bg-ananta-surface rounded-sm overflow-hidden">
-                <AppImage
-                  src={m.image_url || "/noimage.png"}
-                  alt={m.name}
-                  fill
-                  sizes="(max-width: 768px) 50vw, 25vw"
-                  className="object-cover"
-                />
-              </div>
-
-              <div className="mt-2 px-2 pb-2 text-center">
-                <span className="text-sm text-ananta-text break-words">
-                  {m.name}
+            return (
+              <Link
+                key={group.label}
+                href={group.children[0].href}
+                aria-label={group.label}
+                className="group flex min-h-28 flex-col items-center justify-center gap-2 border-r border-ananta-border/50 px-2 py-4 text-center no-underline transition last:border-r-0 hover:bg-ananta-surface focus-visible:z-10 focus-visible:outline focus-visible:outline-2 focus-visible:outline-ananta-accent sm:min-h-36 sm:gap-3 sm:py-5"
+              >
+                <span className="flex size-10 items-center justify-center rounded-full border border-ananta-accent/40 bg-ananta-surface text-ananta-accent shadow-inner shadow-ananta-accent/10 transition group-hover:border-ananta-accent sm:size-12">
+                  <Icon aria-hidden="true" className="size-5 sm:size-6" />
                 </span>
-              </div>
-            </LinkCardBox>
-          ))}
+                <span className="text-xs font-medium text-ananta-text sm:text-sm">
+                  {group.label}
+                </span>
+              </Link>
+            )
+          })}
         </div>
-      </CardPanel>
-
-      {/* WORLD */}
-      <div className="mt-4 mb-4">
-        <GameSectionTitle
-          title="WORLD"
-          subtitle="ストーリー・勢力・世界観"
-        />
-      </div>
-
-      <CardPanel>
-        <ul className="flex flex-col gap-2 text-sm">
-          <li><Link href="/world/story">ストーリー概要</Link></li>
-          <li><Link href="/world/factions">勢力・組織</Link></li>
-          <li><Link href="/world/history">世界の歴史</Link></li>
-        </ul>
-      </CardPanel>
-
-      {/* DATABASE */}
-      <div className="mt-4 mb-4">
-        <GameSectionTitle
-          title="DATABASE"
-          subtitle="データベース一覧・検索・タグ"
-        />
-      </div>
-
-      <CardPanel>
-        <ul className="flex flex-col gap-2 text-sm">
-          <li><Link href="/database/all">全データ一覧</Link></li>
-          <li><Link href="/database/search">データ検索</Link></li>
-          <li><Link href="/database/tags">タグ一覧</Link></li>
-        </ul>
-      </CardPanel>
-
-      {/* RECOMMENDED */}
-      <div className="mt-4 mb-4">
-        <GameSectionTitle
-          title="RECOMMENDED"
-          subtitle="おすすめページ"
-        />
-      </div>
-
-      <CardPanel>
-        <ul className="flex flex-col gap-2 text-sm">
-          {recommendedPages.map((p) => (
-            <li key={p.id}>
-              <Link href={`/pages/${p.slug}`}>
-                <div className="flex items-center gap-2">
-                  <FileText className="size-4 shrink-0 text-ananta-muted" />{p.title}
-                </div>
-              </Link>
-            </li>
-          ))}
-        </ul>
-      </CardPanel>
-
-      {/* 最新コメント付きページ */}
-      <div className="mt-4 mb-4">
-        <GameSectionTitle
-          title="LATEST COMMENTS"
-          subtitle="最新コメント付きページ"
-        />
-      </div>
-
-      <CardPanel>
-        <ul className="flex flex-col gap-3 text-sm">
-          {latestComments.map((c) => (
-            <li key={c.id} className="flex flex-col gap-1">
-
-
-              <Link href={resolvePageUrl(c.page)}>
-                <div className="flex items-center gap-2">
-                  <MessageSquare className="size-4 shrink-0 text-ananta-muted" />
-                  {c.page.title}
-                  <span className="text-xs text-ananta-muted">
-                    {toDateTimeString(c.created_at)}
-                  </span>
-                </div>
-              </Link>
-
-            </li>
-          ))}
-        </ul>
-      </CardPanel>
-
+      </section>
     </SiteShell>
   )
 }

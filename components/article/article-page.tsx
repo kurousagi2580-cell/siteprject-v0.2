@@ -60,7 +60,7 @@ export default async function ArticlePage({ id, slug, entitySlug, entityType, pr
 
         {article.eyecatch && <div className="mb-4">{article.eyecatch}</div>}
 
-        <div className="prose prose-invert max-w-none">
+        <div className="prose prose-invert article-markdown max-w-none">
           <ArticleBody html={html} />
 
         </div>

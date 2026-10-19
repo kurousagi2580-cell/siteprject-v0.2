@@ -7,15 +7,15 @@ const schema: Schema = {
   tagNames: [
     ...(defaultSchema.tagNames || []),
     "h1", "h2", "h3", "h4", "h5", "h6",
-    "figure", "figcaption", "details", "summary",
+    "div", "figure", "figcaption", "details", "summary",
     "table", "thead", "tbody", "tfoot", "tr", "th", "td",
     "pre", "code", "kbd", "samp", "var",
-    "img", "picture", "source",
+    "img", "picture", "source", "br",
     "blockquote", "hr"
   ],
   attributes: {
     // schema.attributes の "*": [...]
-    "*": ["className", "id", "title", "aria-hidden", "role", "data-video-id", "data-tweet-id"]
+    "*" : ["className", "id", "title", "aria-hidden", "role", "data-video-id", "data-tweet-id", "data-markdown-color", "data-markdown-size"]
     ,
     a: ["href", "title", "rel", "target"],
     img: ["src", "alt", "title", "width", "height", "loading"],

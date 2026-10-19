@@ -13,9 +13,17 @@ type FormLayoutProps = {
   submitLabel?: string;
   children: React.ReactNode;
   className?: string;
+  viewportLayout?: boolean;
 };
 
-export default function FormLayout({ title, onSubmit, submitLabel = "保存", children, className }: FormLayoutProps) {
+export default function FormLayout({
+  title,
+  onSubmit,
+  submitLabel = "保存",
+  children,
+  className,
+  viewportLayout = false,
+}: FormLayoutProps) {
   const [loading, setLoading] = React.useState(false);
   const [status, setStatus] = React.useState<string>("");
 
@@ -36,14 +44,29 @@ export default function FormLayout({ title, onSubmit, submitLabel = "保存", ch
   }
 
   return (
-    <Section id="form">
-      <Surface variant="raised" className="p-6 rounded-xl flex flex-col gap-6">
-        <form onSubmit={handleSubmit} className={className ?? "flex flex-col gap-6"}>
-          <h2 className="text-xl font-bold">{title}</h2>
+    <Section
+      id="form"
+      className={viewportLayout ? "!my-0 h-[calc(100dvh-6.5rem)] min-h-[32rem]" : undefined}
+      contentClassName={viewportLayout ? "h-full" : undefined}
+    >
+      <Surface
+        variant="raised"
+        className={`flex flex-col rounded-xl ${
+          viewportLayout ? "h-full min-h-0 p-3 sm:p-4" : "gap-6 p-6"
+        }`}
+      >
+        <form
+          onSubmit={handleSubmit}
+          className={
+            className ??
+            (viewportLayout ? "flex h-full min-h-0 flex-col gap-3" : "flex flex-col gap-6")
+          }
+        >
+          <h2 className={`shrink-0 font-bold ${viewportLayout ? "text-lg" : "text-xl"}`}>{title}</h2>
 
-          <div>{children}</div>
+          <div className={viewportLayout ? "min-h-0 flex-1 overflow-hidden" : ""}>{children}</div>
 
-          <div className="flex items-center gap-3">
+          <div className={`flex shrink-0 items-center gap-3 ${viewportLayout ? "border-t border-ananta-border/50 pt-2" : ""}`}>
             <button type="submit" disabled={loading} className="bg-ananta-accent text-white px-4 py-2 rounded hover:bg-ananta-accent/80">
               {submitLabel}
             </button>

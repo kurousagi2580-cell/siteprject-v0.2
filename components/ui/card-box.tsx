@@ -1,17 +1,19 @@
-import { cn } from "@/lib/utils/utils";
+
+import type { ReactNode } from "react"
+import { cn } from "@/lib/utils/utils"
 
 export function CardBox({
   children,
   className,
 }: {
-  children: React.ReactNode
+  children: ReactNode
   className?: string
 }) {
   return (
     <div
       className={cn(
-        "rounded-sm p-3 text-ananta-text space-y-3 bg-ananta-surface/40 backdrop-blur-md border border-ananta-border/30",
-        className
+        "rounded-lg border border-ananta-border/70 bg-ananta-surface2/85 p-4 text-ananta-text shadow-sm shadow-black/10",
+        className,
       )}
     >
       {children}
@@ -19,12 +21,4 @@ export function CardBox({
   )
 }
 
-export function CardHeading({ children }: { children: React.ReactNode }) {
-  return (
-    <h3 className="flex items-center gap-2 text-base font-bold text-ananta-text tracking-wide mb-2">
-      <div className="h-3 w-1 bg-ananta-accent rounded-sm" />
-      {children}
-    </h3>
-  )
-}
 

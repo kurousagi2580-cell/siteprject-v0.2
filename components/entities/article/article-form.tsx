@@ -1,5 +1,6 @@
 // src/components/admin/ArticleFormWrapper.tsx
 "use client";
+import { useRouter } from "next/navigation";
 import type { SchemaField } from "@/components/entities/common/file-renderes";
 import { makeFormHandlers } from "@/lib/api/form-api";
 import { denormalizeDotKeys } from "@/lib/utils/denormalize-dot";
@@ -17,6 +18,7 @@ const articleSchema: SchemaField[] = [
 const basepath = "/api/admin/articles"
 
 export default function ArticleFormWrapper({ mode, initialArticle }: any) {
+  const router = useRouter();
 
   const schema = articleSchema.map((a) => {
     if (a.key === "category") {
@@ -45,6 +47,9 @@ export default function ArticleFormWrapper({ mode, initialArticle }: any) {
       transformPayload={denormalizeDotKeys}
       submitLabel={mode === "create" ? "作成" : "保存"}
       enablePreview={true}
+      markdownEditorLayout="tabbed"
+      viewportLayout
+      onSuccess={() => router.push("/admin/articles")}
     />
   );
 }

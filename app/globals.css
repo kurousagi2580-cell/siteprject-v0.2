@@ -192,6 +192,137 @@
     border-radius: 0.375rem;
   }
 
+  .article-markdown h1,
+  .article-markdown h2,
+  .article-markdown h3,
+  .article-markdown h4,
+  .article-markdown h5,
+  .article-markdown h6 {
+    position: relative;
+    border-bottom: 1px solid color-mix(in srgb, var(--ananta-border) 50%, transparent);
+    padding: 0 0 0.75rem 1rem;
+    color: var(--ananta-text);
+  }
+
+  .article-markdown h1::before,
+  .article-markdown h2::before,
+  .article-markdown h3::before,
+  .article-markdown h4::before,
+  .article-markdown h5::before,
+  .article-markdown h6::before {
+    position: absolute;
+    top: 0.15em;
+    left: 0;
+    width: 0.25rem;
+    height: 1.25rem;
+    border-radius: 9999px;
+    background: var(--ananta-accent);
+    content: "";
+  }
+
+  .article-markdown h1 {
+    font-size: 1.5rem;
+    font-weight: 700;
+  }
+
+  .article-markdown h2 {
+    font-size: 1.125rem;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+  }
+
+  .article-markdown h3 {
+    font-size: 1rem;
+    font-weight: 700;
+  }
+
+  .article-markdown h4,
+  .article-markdown h5,
+  .article-markdown h6 {
+    font-size: 0.9375rem;
+    font-weight: 600;
+  }
+
+  .article-markdown p {
+    margin-block: 0.5rem;
+  }
+
+  .article-markdown .markdown-spacer {
+    display: block;
+    width: 100%;
+  }
+
+  .article-markdown .markdown-spacer-16 {
+    height: 1rem;
+  }
+
+  .article-markdown .markdown-spacer-32 {
+    height: 2rem;
+  }
+
+  .article-markdown .markdown-spacer-48 {
+    height: 3rem;
+  }
+
+  .article-markdown .markdown-spacer-64 {
+    height: 4rem;
+  }
+
+  .prose table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+
+  .prose th,
+  .prose td {
+    border: 1px solid var(--ananta-border);
+    padding: 0.5rem 0.75rem;
+    text-align: left;
+  }
+
+  .prose th {
+    background: var(--ananta-surface2);
+  }
+
+  .markdown-align-left {
+    text-align: left;
+  }
+
+  .markdown-align-center {
+    text-align: center;
+  }
+
+  .markdown-align-right {
+    text-align: right;
+  }
+
+  .prose blockquote.markdown-align-left,
+  .prose blockquote.markdown-align-center,
+  .prose blockquote.markdown-align-right {
+    margin: 0;
+    border-left: 0;
+    padding-left: 0;
+    color: inherit;
+  }
+
+  .markdown-toc {
+    padding: 1rem 1rem 1rem 2.5rem;
+    border: 1px solid var(--ananta-border);
+    border-radius: 0.5rem;
+    background: var(--ananta-surface2);
+  }
+
+  .markdown-toc-level-2 {
+    margin-left: 1rem;
+  }
+
+  .markdown-toc-level-3,
+  .markdown-toc-level-4,
+  .markdown-toc-level-5,
+  .markdown-toc-level-6 {
+    margin-left: 2rem;
+  }
+
   /* Ensure links use ananta link color */
   a {
     color: var(--ananta-link);

@@ -20,7 +20,7 @@ export function MarkdownPreview({ source }: { source: string }) {
 
   return (
     <>
-      <div className="prose prose-invert max-w-none" dangerouslySetInnerHTML={{ __html: html }} />
+      <div className="prose prose-invert article-markdown max-w-none" dangerouslySetInnerHTML={{ __html: html }} />
       <ArticleEmbeds refreshKey={embedRevision} />
     </>
   )

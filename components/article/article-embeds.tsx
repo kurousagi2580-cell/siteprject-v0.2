@@ -7,8 +7,14 @@ import { XEmbed } from "@/components/embed/x";
 
 export default function ArticleEmbeds({ refreshKey }: { refreshKey?: number }) {
   const roots = useRef(new Map<Element, Root>());
+  const pruneTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
+    if (pruneTimer.current) {
+      clearTimeout(pruneTimer.current);
+      pruneTimer.current = null;
+    }
+
     const mount = (element: HTMLDivElement, component: ReactNode) => {
       if (roots.current.has(element)) return;
       try {
@@ -34,9 +40,24 @@ export default function ArticleEmbeds({ refreshKey }: { refreshKey?: number }) {
       }
     });
 
+    const pruneDetachedRoots = () => {
+      pruneTimer.current = null;
+      roots.current.forEach((root, element) => {
+        if (element.isConnected) return;
+        roots.current.delete(element);
+        root.unmount();
+      });
+    };
+
+    const schedulePrune = () => {
+      if (pruneTimer.current) clearTimeout(pruneTimer.current);
+      pruneTimer.current = setTimeout(pruneDetachedRoots, 0);
+    };
+
+    schedulePrune();
+
     return () => {
-      roots.current.forEach((root) => root.unmount());
-      roots.current.clear();
+      schedulePrune();
     };
   }, [refreshKey]);
 

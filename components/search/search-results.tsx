@@ -51,7 +51,7 @@ export function SearchResults({
             renderItem: (a: Character) => (
                 <LinkCardBox
                     key={a.id}
-                    href={`/affiliations/${a.id}`}
+                    href={`/characters/${a.slug}`}
                     className="w-full hover:opacity-90"
                 >
                     <AppImage
@@ -69,23 +69,26 @@ export function SearchResults({
         {
             title: "所属",
             results: affiliationResults,
-            renderItem: (a: Affiliation) => (
-                <LinkCardBox
-                    key={a.id}
-                    href={`/affiliations/${a.id}`}
-                    className="w-full hover:opacity-90"
-                >
-                    <AppImage
-                        src={a.icon_url || "/placeholder.png"}
-                        alt={a.name}
-                        width={400}
-                        height={300}
-                        sizes="(max-width: 768px) 50vw, 25vw"
-                        className="w-full aspect-[4/3] object-cover rounded-sm"
-                    />
-                    <p className="mt-2 text-center text-sm">{a.name}</p>
-                </LinkCardBox>
-            ),
+            renderItem: (a: Affiliation) => {
+                if (!a.slug) return null
+                return (
+                    <LinkCardBox
+                        key={a.id}
+                        href={`/affiliations/${a.slug}`}
+                        className="w-full hover:opacity-90"
+                    >
+                        <AppImage
+                            src={a.icon_url || "/placeholder.png"}
+                            alt={a.name}
+                            width={400}
+                            height={300}
+                            sizes="(max-width: 768px) 50vw, 25vw"
+                            className="w-full aspect-[4/3] object-cover rounded-sm"
+                        />
+                        <p className="mt-2 text-center text-sm">{a.name}</p>
+                    </LinkCardBox>
+                )
+            },
         },
         {
             title: "国",
