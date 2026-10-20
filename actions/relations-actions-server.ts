@@ -6,7 +6,6 @@ import type { Relationship } from "@/types/relationships";
 const actions = makeCrudActions<Relationship>("relationships", "character_id");
 
 export async function createRelationFromObject(payload: Record<string, any>) {
-  // 必要なサーバー側バリデーションをここで行う
   if (!payload.character_id) return { success: false, error: "character_id required" };
   const created = await actions.create(payload);
   return { success: true, id: created.id, item: created };

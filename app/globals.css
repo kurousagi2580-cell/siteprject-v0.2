@@ -66,7 +66,7 @@
   --ananta-muted: #8D98A5;
   --ananta-accent: #B9FF3D;
   --ananta-link: #5ED8FF;
-  --ananta-border: rgba(255,255,255,.12);
+  --ananta-border: rgba(255, 255, 255, .12);
   --radius: 0.625rem;
 
   /* Map shadcn / generic tokens to ananta tokens for consistency */
@@ -105,6 +105,15 @@
   --sidebar-border: var(--ananta-border);
   --sidebar-ring: var(--ring);
 
+  --backdrop-image: none;
+  /* layout.tsx から指定 */
+  --backdrop-height: clamp(300px, 40vw, 560px);
+  /* 背景の高さ */
+  --backdrop-overlay: 0.45;
+  /* 黒オーバーレイの濃さ 0〜1 */
+  --backdrop-fade-start: 50%;
+  /* この位置からフェード開始（60%以下推奨） */
+
   /* Ensure color-scheme is declared */
   color-scheme: dark;
 }
@@ -132,19 +141,6 @@
   color-scheme: dark;
 }
 
-/* If you want to respect user preference instead of forcing dark, remove the .dark-only approach above
-   and enable the following media block. If site is dark-fixed, you can safely remove this block. */
-/* (Removed to avoid duplication when dark is forced via html.class="dark") */
-/*
-@media (prefers-color-scheme: dark) {
-  :root:not(.light) {
-    --background: var(--ananta-bg);
-    --foreground: var(--ananta-text);
-    ...
-  }
-}
-*/
-
 /* Slider track utility */
 .slider-track {
   display: flex;
@@ -153,6 +149,7 @@
 
 /* Tailwind utilities and components consolidation */
 @layer utilities {
+
   /* Glass card utility used by Surface / Card components */
   .glass {
     background: color-mix(in oklab, var(--ananta-surface) 50%, transparent);
@@ -164,15 +161,20 @@
 
   /* Optional: small shadow utility for raised elements */
   .ananta-shadow-sm {
-    box-shadow: 0 1px 2px rgba(0,0,0,0.4);
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.4);
   }
 }
 
 /* Base layer: normalize common element defaults */
 @layer base {
+
   /* Apply border color and focus ring defaults */
   * {
     @apply border-border outline-none;
+  }
+
+  html {
+    background-color: var(--ananta-bg);
   }
 
   /* Body defaults: use foreground token and transparent background to allow layout backgrounds */
@@ -330,14 +332,39 @@
   }
 }
 
-/* Example Surface component usage classes (kept for reference) */
-/* Use these classes in JSX: <div class="rounded-sm glass p-4"> ... </div> */
-/* Or for default surface: <div class="rounded-sm bg-ananta-surface p-3"> ... </div> */
+.site-backdrop {
+  position: absolute;
+  inset: 0 0 auto 0;
+  z-index: -10;
+  height: var(--backdrop-height);
+  overflow: hidden;
+  pointer-events: none;
+  background-color: var(--ananta-bg);
+}
 
-/* Fixes for common typos and invalid classes:
-   - Replace occurrences of `grid-cols2` with `grid-cols-2`
-   - Replace `border-ananta-border/500` with `border border-ananta-border` or `border` + custom color utility
-   - Remove any CSS comments inside JSX className strings
-*/
+/* 画像の上に重ねる：下方向のフェード＋黒オーバーレイ */
+.site-backdrop::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(
+      to bottom,
+      transparent 0%,
+      transparent var(--backdrop-fade-start),
+      color-mix(in srgb, var(--ananta-bg) 55%, transparent) 70%,
+      color-mix(in srgb, var(--ananta-bg) 85%, transparent) 88%,
+      var(--ananta-bg) 100%
+    ),
+    linear-gradient(rgb(0 0 0 / var(--backdrop-overlay)), rgb(0 0 0 / var(--backdrop-overlay)));
+}
 
-/* End of stylesheet */
+@media (max-width: 639px) {
+  :root {
+    --backdrop-height: 62vw;    /* 画像の縦横比に合わせた高さ */
+    --backdrop-fade-start: 40%;
+  }
+  .site-backdrop {
+    top: 80px;
+  }
+}

@@ -24,8 +24,11 @@ export type Relationship = {
   character_id: string
   target_character_id: string | null
   relation_type: string | null
-  direction: string | null
+  direction: "one-way" | "two-way" | null
   relation_description: string | null
+  strength: number
+  sort_order: number
+  created_at: string
   updated_at: string | null
 }
 

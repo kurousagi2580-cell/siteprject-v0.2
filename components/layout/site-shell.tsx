@@ -3,7 +3,7 @@ import { type ReactNode } from "react"
 import Link from "next/link"
 import { Search } from "lucide-react"
 
-import { sidebarNav } from "@/components/nav-items"
+import { aggregateSidebarNav } from "@/components/nav-items"
 import { SidebarNav } from "@/components/ui/sidebar-nav"
 import { PageNavigation } from "@/components/ui/page-navigation"
 import { AdBanner } from "@/components/ui/ad-banner"
@@ -82,7 +82,7 @@ export function SiteShell({
           <div className="col-start-2 row-start-1 shrink-0 md:hidden">
             <MobileSidebarToggle
               showSidebar={showSidebar}
-              sidebarItems={sidebarNav}
+              sidebarItems={aggregateSidebarNav}
               pageNavItems={pageNavItems}
               headerOffset={headerOffset}
               rightNavMode={rightNavMode}
@@ -103,7 +103,7 @@ export function SiteShell({
         {showSidebar ? (
           <aside className="sticky top-24 hidden h-[calc(100vh-7rem)] self-start lg:block">
             <div className="flex h-full min-h-0 flex-col overflow-hidden rounded-lg border border-ananta-border/60 bg-ananta-surface/75 p-3 shadow-lg shadow-black/10 backdrop-blur-xl">
-              <SidebarNav items={sidebarNav} />
+              <SidebarNav items={aggregateSidebarNav} />
             </div>
           </aside>
         ) : (

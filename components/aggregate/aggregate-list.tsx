@@ -17,7 +17,6 @@ export function AggregateList({
   filters: AggregateFilterConfig[]
 }) {
   const [selectedFilters, setSelectedFilters] = useState<Record<string, string>>({})
-
   const filterOptions = useMemo(
     () =>
       Object.fromEntries(

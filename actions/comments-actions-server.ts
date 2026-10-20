@@ -10,7 +10,8 @@ export async function createCommentFromObject(payload: Record<string, any>) {
   // 必要なサーバー側バリデーションをここで行う
   if (!payload.page_id) return { success: false, error: "page_id required" };
   const created = await actions.create(payload);
-  return { success: true, id: created.id, item: created };
+  const { ip: _ip, ...publicComment } = created;
+  return { success: true, id: created.id, item: publicComment };
 }
 
 export async function updateCommentFromObject(id: string, payload: Record<string, any>) {

@@ -4,10 +4,10 @@ import { useEffect, useState } from "react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { ChevronDown, ChevronRight } from "lucide-react"
-import { sidebarNav, type SidebarNavItem } from "../nav-items"
+import { aggregateSidebarNav, type SidebarNavItem } from "../nav-items"
 
 export function SidebarNav({
-  items = sidebarNav,
+  items = aggregateSidebarNav,
 }: {
   items?: SidebarNavItem[]
 }) {

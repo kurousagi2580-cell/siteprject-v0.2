@@ -19,13 +19,23 @@ export async function getSearchResults({ q, page = 1, pageSize = 20, tab = "all"
   const like = `%${q}%`;
 
   // 例: characters
-  const [{ data: characters = [], count: cCount }, { data: affiliations = [], count: aCount }, { data: countries = [], count: coCount }, { data: regions = [], count: rCount }, { data: events = [], count: eCount }] = await Promise.all([
+  const results = await Promise.all([
     readdb.from("characters").select("*", { count: "exact" }).ilike("name", like).range(from, to),
     readdb.from("affiliation").select("*", { count: "exact" }).ilike("name", like).range(from, to),
     readdb.from("countries").select("*", { count: "exact" }).ilike("name", like).range(from, to),
     readdb.from("regions").select("*", { count: "exact" }).ilike("name", like).range(from, to),
     readdb.from("game_events").select("*", { count: "exact" }).ilike("title", like).range(from, to),
   ]);
+  for (const { error } of results) {
+    if (error) throw error;
+  }
+  const [
+    { data: characters, count: cCount },
+    { data: affiliations, count: aCount },
+    { data: countries, count: coCount },
+    { data: regions, count: rCount },
+    { data: events, count: eCount },
+  ] = results;
 
   return {
     characters: characters ?? [],

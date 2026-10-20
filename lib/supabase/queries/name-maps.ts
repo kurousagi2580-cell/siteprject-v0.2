@@ -1,7 +1,7 @@
 // src/lib/nameMap.ts
-import { createSupabaseAdminClient } from "@/lib/supabase/admin";
+import { createSupabaseServerClient } from "@/lib/supabase/server";
 
-const supabase = createSupabaseAdminClient();
+const supabase = createSupabaseServerClient();
 
 let nameMapCache: Record<string,string> = {};
 let lastLoaded = 0;

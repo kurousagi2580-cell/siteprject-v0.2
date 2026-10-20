@@ -68,6 +68,15 @@ type AffiliationRow = {
   slug: string | null
 }
 
+type WordsRow = {
+  id: string
+  keyword: string
+  read_word: string | null
+  image_url: string | null
+  slug: string | null
+  category: string | null
+}
+
 const filterKeysByEntity = {
   characters: ["affiliation"],
   countries: [],
@@ -216,39 +225,70 @@ export async function getAggregatePageData(
     }
   }
 
+  if (page.entity_type === "regions") {
+    const { data, error } = await supabase
+      .from("regions")
+      .select("id, name, short_name, image_url, slug, country:countries!regions_parent_id_fkey (name)")
+      .order("order", { ascending: true, nullsFirst: false })
+      .order("name", { ascending: true })
+      .returns<RegionRow[]>()
+
+    if (error) {
+      console.error("getAggregatePageData regions error:", error)
+      throw error
+    }
+
+    return {
+      page,
+      filters,
+      entries: data.flatMap((region) => {
+        if (!region.slug) return []
+        return [{
+          id: region.id,
+          name: region.name,
+          short_name: region.short_name,
+          image_url: region.image_url,
+          slug: region.slug,
+          href: `/regions/${region.slug}`,
+          filter_values: {
+          country: region.country?.name ? [region.country.name] : [],
+        },
+        }]
+      }),
+    }
+  }
+
   const { data, error } = await supabase
-    .from("regions")
+    .from("words")
     .select(`
       id,
-      name,
-      short_name,
+      keyword,
+      read_word,
       image_url,
       slug,
-      country:countries!regions_parent_id_fkey (name)
+      category
     `)
-    .order("name", { ascending: true })
-    .returns<RegionRow[]>()
+    .order("keyword", { ascending: true })
+    .returns<WordsRow[]>()
 
   if (error) {
-    console.error("getAggregatePageData regions error:", error)
+    console.error("getAggregatePageData words error:", error)
     throw error
   }
 
   return {
     page,
     filters,
-    entries: data.flatMap((region) => {
-      if (!region.slug) return []
+    entries: data.flatMap((word) => {
+      if (!word.slug) return []
       return [{
-        id: region.id,
-        name: region.name,
-        short_name: region.short_name,
-        image_url: region.image_url,
-        slug: region.slug,
-        href: `/regions/${region.slug}`,
-        filter_values: {
-          country: region.country?.name ? [region.country.name] : [],
-        },
+        id: word.id,
+        name: word.keyword,
+        short_name: word.read_word,
+        image_url: word.image_url,
+        slug: word.slug,
+        href: `/words/${word.slug}`,
+        filter_values: {},
       }]
     }),
   }

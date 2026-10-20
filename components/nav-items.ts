@@ -15,7 +15,7 @@ export type SidebarNavItem = {
   }[]
 }
 
-export const sidebarNav: SidebarNavItem[] = [
+export const aggregateSidebarNav: SidebarNavItem[] = [
   {
     label: "キャラクター図鑑",
     children: [
@@ -35,6 +35,7 @@ export const sidebarNav: SidebarNavItem[] = [
     label: "世界観",
     children: [
       { label: "所属", href: "/aggregate/affiliations" },
+      { label: "用語", href: "/aggregate/words" },
     ],
   },
 ]

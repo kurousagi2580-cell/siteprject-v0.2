@@ -1,5 +1,6 @@
 import { Analytics } from '@vercel/analytics/next'
 import type { Metadata, Viewport } from 'next'
+import { AppImage } from '@/components/app-image'
 import './globals.css'
 
 export const revalidate = 60
@@ -47,12 +48,17 @@ export default function RootLayout({
       <body className="antialiased">
         {/* 背景レイヤー */}
         <div className="fixed inset-0 -z-10">
-          <div
-            className="absolute inset-0 bg-cover bg-center bg-no-repeat"
-            style={{ backgroundImage: "url('/images/backgrounds/shinke.webp')" }}
-
-          />
-          <div className="absolute inset-0 bg-black/60" />
+          {/* 背景レイヤー（調整は globals.css の --backdrop-* ） */}
+          <div aria-hidden="true" className="site-backdrop">
+            <AppImage
+              src="backgrounds/title.webp"
+              alt=""
+              fill
+              priority
+              sizes="100vw"
+              className="object-cover object-[50%_0%] lg:object-[50%_20%]"
+            />
+          </div>
         </div>
 
         {/* コンテンツ */}

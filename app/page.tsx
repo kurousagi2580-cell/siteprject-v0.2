@@ -1,7 +1,7 @@
 import Link from "next/link"
 import { Map, Users, Globe2, type LucideIcon } from "lucide-react"
 import { SiteShell } from "@/components/layout/site-shell"
-import { sidebarNav } from "@/components/nav-items"
+import { aggregateSidebarNav } from "@/components/nav-items"
 
 const aggregateIcons: Record<string, LucideIcon> = {
   キャラクター図鑑: Users,
@@ -12,15 +12,18 @@ const aggregateIcons: Record<string, LucideIcon> = {
 export default function TopPage() {
   return (
     <SiteShell rightNavMode="none">
-      <header className="mb-4">
-        <h1 className="text-2xl font-bold tracking-wide text-ananta-text sm:text-3xl">
-          ANANTA DATABASEへようこそ
+      <header className="mt-6 sm:mt-8 mb-10 sm:mb-14">
+        <h1 className="text-3xl font-bold tracking-wide text-ananta-text drop-shadow-[0_2px_8px_rgb(0_0_0/0.6)] sm:text-4xl lg:text-6xl">
+          ANANTA DATABASE
         </h1>
+        <p className="mt-2 text-xs tracking-[0.2em] text-ananta-text/80 drop-shadow-[0_1px_4px_rgb(0_0_0/0.6)] sm:text-sm">
+          ようこそ、無限大ANANTA攻略DBへ
+        </p>
       </header>
 
       <figure
         aria-label="注目の画像"
-        className="flex aspect-[16/5] min-h-40 items-center justify-center overflow-hidden rounded-t-xl border border-dashed border-ananta-border bg-gradient-to-br from-ananta-surface2 via-ananta-surface to-ananta-surface2 sm:aspect-[16/4]"
+        className="flex w-full aspect-[16/5] min-h-40 items-center justify-center overflow-hidden rounded-t-xl border border-dashed border-ananta-border bg-gradient-to-br from-ananta-surface2 via-ananta-surface to-ananta-surface2 sm:aspect-[16/4]"
       >
         <figcaption className="text-center">
           <span className="block text-sm font-semibold text-ananta-text">注目の画像</span>
@@ -30,7 +33,7 @@ export default function TopPage() {
 
       <section aria-label="データベース一覧">
         <div className="grid grid-cols-3 overflow-hidden rounded-b-xl border-x border-b border-ananta-border/70 bg-ananta-surface2/80">
-          {sidebarNav.map((group) => {
+          {aggregateSidebarNav.map((group) => {
             const Icon = aggregateIcons[group.label] ?? Users
 
             return (

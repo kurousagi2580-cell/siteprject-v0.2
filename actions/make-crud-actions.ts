@@ -1,8 +1,9 @@
 // src/actions/makeCrudActions.ts
 import "server-only";
 import { revalidatePath } from "next/cache";
-import { createSupabaseAdminClient } from "@/lib/supabase/admin"; // server-only helper
 import { createSupabaseServerClient } from "@/lib/supabase/server"; // server-only helper
+import { createSupabaseSessionClient } from "@/lib/supabase/ssr";
+import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import { generateSlug } from "@/lib/utils/generate-slug"; // slug 生成ユーティリティ
 import { getAdminUser } from "@/lib/auth/require-admin";
 import { parseAdminPayload } from "@/lib/validation/admin-payload";
@@ -37,7 +38,6 @@ export function makeCrudActions<T extends Record<string, any>>(
     publicCreate?: boolean; // true の場合のみ、認証なしで create を許可する（公開コメントなど）
   }
 ): CrudActions<T> {
-  const writedb = createSupabaseAdminClient();
   const readdb = createSupabaseServerClient();
 
   // オプションのデフォルト（create 内にローカル定義することも可能だが、
@@ -159,6 +159,11 @@ export function makeCrudActions<T extends Record<string, any>>(
       }
     }
 
+    // Public comments are written only by the rate-limited API route. All admin writes
+    // use the caller's JWT so PostgreSQL RLS policies are applied.
+    const writedb = opts?.publicCreate
+      ? createSupabaseAdminClient()
+      : await createSupabaseSessionClient();
     const { data, error } = await writedb.from(table).insert<Record<string, unknown>>([row]).select().single();
 
     if (error) {
@@ -181,6 +186,7 @@ export function makeCrudActions<T extends Record<string, any>>(
 
   async function update(id: string, payload: Partial<T>) {
     await getAdminUser(); // 書き込みは管理者のみ
+    const writedb = await createSupabaseSessionClient();
     const updatePayload = { ...payload } as Record<string, unknown>;
 
     if (
@@ -219,6 +225,7 @@ export function makeCrudActions<T extends Record<string, any>>(
 
   async function remove(id: string) {
     await getAdminUser(); // 書き込みは管理者のみ
+    const writedb = await createSupabaseSessionClient();
     const { error } = await writedb.from(table).delete().eq("id", id);
     if (error) throw error;
     revalidatePath("/", "layout");

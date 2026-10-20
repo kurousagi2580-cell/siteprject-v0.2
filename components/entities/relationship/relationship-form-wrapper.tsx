@@ -15,8 +15,22 @@ const relationshipSchema: SchemaField[] = [
   { key: "relation_type", label: "関係タイプ", type: "text" },
   { key: "direction", label: "方向性", type: "select", options: [] },
   { key: "relation_description", label: "説明", type: "textarea" },
+  { key: "strength", label: "関係の強さ（1〜5）", type: "number" },
+  { key: "sort_order", label: "表示順", type: "number" },
   // updated_at は表示のみ（必要なら read-only フィールドとして扱う）
 ];
+
+function transformRelationshipPayload(payload: Record<string, any>) {
+  const transformed = denormalizeDotKeys(payload);
+  transformed.direction = transformed.direction || null;
+  transformed.strength = transformed.strength === "" || transformed.strength == null
+    ? 3
+    : transformed.strength;
+  transformed.sort_order = transformed.sort_order === "" || transformed.sort_order == null
+    ? 0
+    : transformed.sort_order;
+  return transformed;
+}
 
 const basepath = "/api/admin/relations"
 
@@ -40,7 +54,6 @@ export default function RelationshipFormWrapper({
       return {
         ...f,
         options: [
-          { value: "none", label: "未設定" },
           { value: "one-way", label: "⇒（一方通行）" },
           { value: "two-way", label: "⇔（相互関係）" },
         ],
@@ -49,7 +62,7 @@ export default function RelationshipFormWrapper({
     return f;
   });
 
-  const { create, update } = makeFormHandlers(basepath, denormalizeDotKeys);
+  const { create, update } = makeFormHandlers(basepath, transformRelationshipPayload);
 
   return (
     <EntityForm
@@ -59,7 +72,7 @@ export default function RelationshipFormWrapper({
       initialData={initialData}
       onCreate={create}
       onUpdate={update}
-      transformPayload={denormalizeDotKeys}
+      transformPayload={transformRelationshipPayload}
       submitLabel={mode === "create" ? "作成" : "保存"}
       enablePreview={false}
     />

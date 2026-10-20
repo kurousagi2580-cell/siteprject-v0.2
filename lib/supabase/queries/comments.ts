@@ -19,7 +19,7 @@ export async function getLatestComments(): Promise<LatestComment[] | null> {
       )
   `
     const { data, error } = await supabase
-        .from("comments")
+        .from("comments_view")
         .select(select)
         .limit(50)
         .order("created_at", {ascending: false})
