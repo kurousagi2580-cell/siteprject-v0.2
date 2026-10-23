@@ -229,7 +229,6 @@ export async function getAggregatePageData(
     const { data, error } = await supabase
       .from("regions")
       .select("id, name, short_name, image_url, slug, country:countries!regions_parent_id_fkey (name)")
-      .order("order", { ascending: true, nullsFirst: false })
       .order("name", { ascending: true })
       .returns<RegionRow[]>()
 

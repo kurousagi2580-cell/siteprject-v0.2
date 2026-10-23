@@ -1,3 +1,4 @@
+import Link from "next/link"
 import { requireAdminPage } from "@/lib/auth/require-admin";
 import { SiteShell } from "@/components/layout/site-shell"
 import AdminDBClient from "@/components/admin/admin-db-client"
@@ -38,6 +39,15 @@ export default async function AdminDBPage() {
             <Surface variant="raised" className="h-52 md:h-64 flex items-center justify-center text-xl font-bold">
                 管理者用ぺージ
             </Surface>
+
+            <div className="flex flex-wrap gap-2">
+                <Link
+                    href="/admin/relationgraph"
+                    className="rounded border border-ananta-border px-3 py-1 text-sm text-ananta-text no-underline hover:border-ananta-accent"
+                >
+                    相関図の配置を編集
+                </Link>
+            </div>
 
             <form action={logout} className="flex justify-end">
                 <button type="submit" className="rounded border border-ananta-border px-3 py-1 text-sm text-ananta-muted hover:text-ananta-text">

@@ -71,7 +71,7 @@ export default async function CharacterDetailPage({
 
         <ProfileSection character={character} />
         {showSkills && <SkillsSection />}
-        <RelationsSection relations={relations} />
+        <RelationsSection relations={relations} slug={slug} />
         <RelatedArticlesSection articles={relatedArticle} entitySlug={slug} entityType="characters" />
         <CommentSection pageId={page.id} />
 

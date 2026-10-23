@@ -1,52 +1,31 @@
-import { RelationshipGraph } from "@/components/ui/relationship-graph"
-import { layoutNodes } from "@/lib/grah/relationship-layout"
-import { createSupabaseServerClient } from "@/lib/supabase/server" // ← 既存の Supabase クライアントの取得方法に置き換える
+import { Suspense } from "react"
+import type { Metadata } from "next"
+import { SiteShell } from "@/components/layout/site-shell"
+import { GameSectionTitle } from "@/components/ui/game-section-title"
+import { Section } from "@/components/ui/section"
+import { RelationshipGraph } from "@/components/relationship/relationship-graph"
+import { getRelationshipGraphData } from "@/lib/supabase/queries/relationship-graph"
 
-// direction が「双方向」を表す値に合わせて変更する
-const MUTUAL = new Set(["both", "bidirectional", "mutual"])
+export const metadata: Metadata = {
+  title: "キャラクター相関図",
+  description: "キャラクター同士の関係を図で確認できます。",
+}
 
-export default async function RelationsPage() {
-  const supabase = await createSupabaseServerClient()
+export default async function RelationGraphPage() {
+  const data = await getRelationshipGraphData()
 
-  const [chars, rels] = await Promise.all([
-    supabase.from("characters").select("id, name, short_name, image_url, slug"),
-    supabase
-      .from("relationships")
-      .select("id, character_id, target_character_id, relation_type, relation_description, direction"),
-  ])
-  if (chars.error) throw new Error(chars.error.message)
-  if (rels.error) throw new Error(rels.error.message)
-
-  const exists = new Set(chars.data.map((c) => String(c.id)))
-
-  // 両端のキャラが存在する関係だけを使う
-  const relations = rels.data
-    .filter((r) => exists.has(String(r.character_id)) && exists.has(String(r.target_character_id)))
-    .map((r) => ({
-      id: String(r.id),
-      source: String(r.character_id),
-      target: String(r.target_character_id),
-      label: r.relation_type ?? "",
-      description: r.relation_description ?? null,
-      mutual: MUTUAL.has(r.direction ?? ""),
-    }))
-
-  // 関係のあるキャラだけを表示する（関係のないキャラは出さない）
-  const connected = new Set(relations.flatMap((r) => [r.source, r.target]))
-  const targets = chars.data.filter((c) => connected.has(String(c.id)))
-
-  const pos = layoutNodes(
-    targets.map((c) => String(c.id)),
-    relations.map((r) => ({ source: r.source, target: r.target })),
+  return (
+    <SiteShell>
+      <Section>
+        <GameSectionTitle
+          title="RELATIONSHIP MAP"
+          subtitle="キャラクター同士の関係図です。キャラクターを選ぶと、関係のある相手が強調表示されます。"
+        />
+        {/* useSearchParams を使うので Suspense が必要（ページ自体は静的のまま） */}
+        <Suspense fallback={null}>
+          <RelationshipGraph {...data} />
+        </Suspense>
+      </Section>
+    </SiteShell>
   )
-
-  const characters = targets.map((c) => ({
-    id: String(c.id),
-    name: c.short_name ?? c.name,
-    image: c.image_url,
-    href: `/characters/${c.slug}`, // ← 実際のキャラ詳細ページの URL に合わせる
-    ...pos.get(String(c.id))!,
-  }))
-
-  return <RelationshipGraph characters={characters} relations={relations} />
 }
