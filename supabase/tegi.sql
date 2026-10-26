@@ -148,11 +148,12 @@ CREATE TABLE public.updates (
 );
 CREATE TABLE public.updateslog (
   id bigint GENERATED ALWAYS AS IDENTITY NOT NULL,
-  type text NOT NULL,
-  target_id bigint NOT NULL,
-  action text NOT NULL,
+  title text NOT NULL,
+  target_url text NOT NULL,
+  summary text NOT NULL,
   description text NOT NULL,
   created_at timestamp with time zone DEFAULT now(),
+  check_type text CHECK (check_type = ANY (ARRAY['new'::text, 'upd'::text])),
   CONSTRAINT updateslog_pkey PRIMARY KEY (id)
 );
 CREATE TABLE public.words (
@@ -189,7 +190,7 @@ CREATE TABLE public.aggregate_pages (
   slug text NOT NULL,
   title text NOT NULL,
   subtitle text,
-  entity_type text NOT NULL CHECK (entity_type = ANY (ARRAY['characters'::text, 'countries'::text, 'regions'::text, 'affiliations'::text])),
+  entity_type text NOT NULL CHECK (entity_type = ANY (ARRAY['characters'::text, 'countries'::text, 'regions'::text, 'affiliations'::text, 'words'::text])),
   is_active boolean NOT NULL DEFAULT true,
   sort_order integer NOT NULL DEFAULT 0,
   created_at timestamp with time zone NOT NULL DEFAULT now(),
@@ -219,4 +220,21 @@ CREATE TABLE public.character_relationship_positions (
   updated_at timestamp with time zone NOT NULL DEFAULT now(),
   CONSTRAINT character_relationship_positions_pkey PRIMARY KEY (id),
   CONSTRAINT character_relationship_positions_character_id_fkey FOREIGN KEY (character_id) REFERENCES public.characters(id)
+);
+CREATE TABLE public.character_relationship_frames (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  diagram_key text NOT NULL DEFAULT 'main'::text,
+  affiliation_id uuid,
+  label text,
+  color text CHECK (color IS NULL OR color ~ '^#[0-9A-Fa-f]{6}$'::text),
+  position_x double precision,
+  position_y double precision,
+  width double precision,
+  height double precision,
+  is_visible boolean NOT NULL DEFAULT true,
+  sort_order integer NOT NULL DEFAULT 0,
+  created_at timestamp with time zone NOT NULL DEFAULT now(),
+  updated_at timestamp with time zone NOT NULL DEFAULT now(),
+  CONSTRAINT character_relationship_frames_pkey PRIMARY KEY (id),
+  CONSTRAINT character_relationship_frames_affiliation_id_fkey FOREIGN KEY (affiliation_id) REFERENCES public.affiliation(id)
 );

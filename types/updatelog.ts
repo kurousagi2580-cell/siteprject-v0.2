@@ -1,8 +1,9 @@
 export type UpdateLog = {
   id: string
-  type: string
-  target_id: string
-  action: string
+  title: string
+  target_url: string
+  summary: string
   description: string
+  check_type: string
   created_at: string
 }

@@ -30,7 +30,7 @@ export function UpdateLogSection({
             <ul className="flex flex-col gap-3 text-sm text-ananta-text">
               {updates.slice(0, 5).map((u) => (
                 <li key={u.id} className="flex flex-col">
-                  <span className="font-bold">{u.target_id}</span>
+                  <span className="font-bold">{u.title}</span>
                   <span className="text-ananta-muted text-xs">
                     {u.created_at} - {u.description}
                   </span>

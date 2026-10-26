@@ -14,11 +14,6 @@ export default async function UpdatesPage() {
     return (
         <SiteShell>
 
-            {/* Surface */}
-            <Surface variant="raised" className="h-52 md:h-64 flex items-center justify-center text-xl font-bold">
-                アップデート情報一覧
-            </Surface>
-
             <Section id="updates">
                 <GameSectionTitle title="UPDATE NOTES" subtitle="更新内容" />
 

@@ -142,6 +142,70 @@ export function makeCrudActions<T extends Record<string, any>>(
    * - slugField が指定されていればサーバー側で必ず生成・正規化する
    * - 挿入は一度だけ行い、UNIQUE 制約違反が返ったらエラーをそのまま投げる
    */
+  function getAuditTitle(target: Record<string, unknown> | null | undefined, fallback: string) {
+    if (!target || typeof target !== "object") {
+      return fallback;
+    }
+
+    for (const key of ["title", "name", "keyword", "ver_id", "slug"]) {
+      const value = target[key];
+      if (typeof value === "string" && value.trim()) {
+        return value.trim();
+      }
+    }
+
+    return fallback;
+  }
+
+  function getAuditTargetUrl(target: Record<string, unknown> | null | undefined, fallback: string) {
+    if (!target || typeof target !== "object") {
+      return fallback;
+    }
+
+    for (const key of ["target_url", "official_url", "url", "link"]) {
+      const value = target[key];
+      if (typeof value === "string" && value.trim()) {
+        return value.trim();
+      }
+    }
+
+    const slug = target.slug;
+    if (typeof slug === "string" && slug.trim()) {
+      return `/${table}/${slug.trim()}`;
+    }
+
+    const idValue = target.id;
+    if (idValue !== undefined && idValue !== null && idValue !== "") {
+      return `/${table}/${String(idValue)}`;
+    }
+
+    return fallback;
+  }
+
+  async function logTableChange(action: "create" | "update" | "delete", record: Record<string, unknown> | null | undefined) {
+    if (table === "updateslog") {
+      return;
+    }
+
+    const adminDb = createSupabaseAdminClient();
+    const summaryText = "";
+    const descriptionText = "";
+    const normalizedAction = action === "create" ? "new" : "upd";
+    const fallbackTitle = `${table} ${action === "create" ? "新規作成" : action === "delete" ? "削除" : "更新"}`;
+
+    const { error } = await adminDb.from("updateslog").insert([{
+      title: getAuditTitle(record, fallbackTitle),
+      target_url: getAuditTargetUrl(record, `/${table}`),
+      summary: summaryText,
+      description: descriptionText,
+      check_type: normalizedAction,
+    }]);
+
+    if (error) {
+      console.warn("Failed to write update log:", error.message);
+    }
+  }
+
   async function create(payload: Partial<T>) {
     if (!opts?.publicCreate) await getAdminUser(); // 書き込みは管理者のみ
     const row = parseAdminPayload(table, payload, "create");
@@ -180,6 +244,7 @@ export function makeCrudActions<T extends Record<string, any>>(
       throw error;
     }
 
+    await logTableChange("create", data as Record<string, unknown> | null | undefined);
     revalidatePath("/", "layout");
     return data as T;
   }
@@ -219,6 +284,7 @@ export function makeCrudActions<T extends Record<string, any>>(
 
     const { data, error } = await writedb.from(table).update<Record<string, unknown>>(row).eq("id", id).select().single();
     if (error) throw error;
+    await logTableChange("update", data as Record<string, unknown> | null | undefined);
     revalidatePath("/", "layout");
     return data as T;
   }
@@ -226,8 +292,12 @@ export function makeCrudActions<T extends Record<string, any>>(
   async function remove(id: string) {
     await getAdminUser(); // 書き込みは管理者のみ
     const writedb = await createSupabaseSessionClient();
+    const { data: existingRow, error: existingError } = await writedb.from(table).select("*").eq("id", id).maybeSingle();
+    if (existingError) throw existingError;
+
     const { error } = await writedb.from(table).delete().eq("id", id);
     if (error) throw error;
+    await logTableChange("delete", (existingRow ?? null) as Record<string, unknown> | null | undefined);
     revalidatePath("/", "layout");
   }
 

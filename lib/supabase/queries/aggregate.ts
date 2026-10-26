@@ -84,6 +84,30 @@ const filterKeysByEntity = {
   affiliations: [],
 } as const
 
+export async function getActiveAggregatePageData(): Promise<AggregatePageData[]> {
+  const supabase = createSupabaseServerClient()
+  const { data: pages, error } = await supabase
+    .from("aggregate_pages")
+    .select("slug, title, subtitle, entity_type, is_active, sort_order")
+    .eq("is_active", true)
+    .order("sort_order", { ascending: true })
+    .order("title", { ascending: true })
+    .returns<AggregatePageConfig[]>()
+
+  if (error) {
+    console.error("getActiveAggregatePageData pages error:", error)
+    throw error
+  }
+
+  const aggregatePages = await Promise.all(
+    pages.map((page) => getAggregatePageData(page.slug)),
+  )
+
+  return aggregatePages.filter(
+    (page): page is AggregatePageData => page !== null,
+  )
+}
+
 export async function getAggregatePageData(
   slug: string,
   characterType: CharacterType = "プレイアブル",

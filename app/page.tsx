@@ -1,15 +1,84 @@
 import Link from "next/link"
-import { Map, Users, Globe2, type LucideIcon } from "lucide-react"
+import { Map as MapIcon, Users, Globe2 as Globe2Icon, type LucideIcon } from "lucide-react"
 import { SiteShell } from "@/components/layout/site-shell"
+import { HomeTrends } from "@/components/home/home-trends"
 import { aggregateSidebarNav } from "@/components/nav-items"
+import { getActiveAggregatePageData } from "@/lib/supabase/queries/aggregate"
+import { createSupabaseServerClient } from "@/lib/supabase/server"
+import type { UpdateLog } from "@/types/updatelog"
 
 const aggregateIcons: Record<string, LucideIcon> = {
   キャラクター図鑑: Users,
-  地理: Map,
-  世界観: Globe2,
+  地理: MapIcon,
+  世界観: Globe2Icon,
 }
 
-export default function TopPage() {
+type RecentUpdateGroup = {
+  label: string
+  items: UpdateLog[]
+}
+
+function getUpdateStateLabel(checkType: string) {
+  switch (checkType) {
+    case "new":
+      return "新規作成"
+    case "upd":
+      return "更新"
+    default:
+      return "更新"
+  }
+}
+
+function groupRecentUpdates(items: UpdateLog[]) {
+  const groups = new Map<string, RecentUpdateGroup>()
+  const now = Date.now()
+
+  for (const item of items) {
+    const createdAt = new Date(item.created_at)
+    const elapsedMs = now - createdAt.getTime()
+    const within24Hours = elapsedMs <= 24 * 60 * 60 * 1000
+    const url = item.target_url || "未設定"
+    const dateKey = createdAt.toISOString().slice(0, 10)
+    const hourKey = String(createdAt.getHours()).padStart(2, "0")
+    const bucketKey = within24Hours ? `${dateKey}-${hourKey}-${url}` : url
+
+    const existing = groups.get(bucketKey) ?? {
+      label: within24Hours
+        ? `${createdAt.getFullYear()}/${String(createdAt.getMonth() + 1).padStart(2, "0")}/${String(createdAt.getDate()).padStart(2, "0")} ${hourKey}時`
+        : `${createdAt.getFullYear()}/${String(createdAt.getMonth() + 1).padStart(2, "0")}/${String(createdAt.getDate()).padStart(2, "0")}`,
+      items: [],
+    }
+
+    existing.items.push(item)
+    groups.set(bucketKey, existing)
+  }
+
+  return Array.from(groups.values()).map((group) => ({
+    ...group,
+    items: [...group.items].sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime()),
+  })).sort((a, b) => {
+    const aTime = new Date(a.items[0]?.created_at ?? 0).getTime()
+    const bTime = new Date(b.items[0]?.created_at ?? 0).getTime()
+    return bTime - aTime
+  })
+}
+
+export default async function TopPage() {
+  const aggregatePages = await getActiveAggregatePageData()
+  const supabase = createSupabaseServerClient()
+  const { data: recentUpdateLogs, error: recentUpdateLogsError } = await supabase
+    .from("updateslog")
+    .select("*")
+    .in("check_type", ["new", "upd"])
+    .order("created_at", { ascending: false })
+    .limit(10)
+
+  if (recentUpdateLogsError) {
+    throw recentUpdateLogsError
+  }
+
+  const recentUpdateGroups = groupRecentUpdates((recentUpdateLogs ?? []) as UpdateLog[])
+
   return (
     <SiteShell rightNavMode="none">
       <header className="mt-6 sm:mt-8 mb-10 sm:mb-14">
@@ -54,6 +123,84 @@ export default function TopPage() {
           })}
         </div>
       </section>
+
+      <div className="mt-5 grid min-w-0 gap-5 lg:grid-cols-[minmax(0,2fr)_minmax(240px,1fr)]">
+        <HomeTrends aggregatePages={aggregatePages} />
+
+        <section
+          aria-labelledby="contributor-ranking-title"
+          className="min-w-0 rounded-xl border border-ananta-border/70 bg-ananta-surface2/80 p-4 shadow-lg shadow-black/10 sm:p-5"
+        >
+          <header className="mb-4 border-b border-ananta-border/50 pb-3">
+            <h2
+              id="contributor-ranking-title"
+              className="text-lg font-bold text-ananta-text"
+            >
+              最新の更新
+            </h2>
+          </header>
+
+          {recentUpdateGroups.length === 0 ? (
+            <div className="space-y-4">
+              <div className="flex min-h-40 items-center justify-center rounded-lg border border-ananta-border/50 bg-ananta-surface/50 px-4 text-center">
+                <p className="text-sm text-ananta-muted">
+                  直近の更新はありません。
+                </p>
+              </div>
+              <div className="border-t border-ananta-border/50 pt-3 text-right">
+                <Link
+                  href="/updates"
+                  className="inline-flex items-center text-sm font-medium text-ananta-link underline-offset-2 hover:underline"
+                >
+                  更新履歴を一覧で見る
+                </Link>
+              </div>
+            </div>
+          ) : (
+            <div className="space-y-4">
+              {recentUpdateGroups.map((group) => {
+                const firstItem = group.items[0]
+                const newestItem = firstItem ?? group.items[0]
+
+                return (
+                  <div
+                    key={`${group.label}-${newestItem?.target_url ?? "unknown"}-${newestItem?.created_at ?? "na"}`}
+                    className="space-y-2"
+                  >
+                    <div className="border-b border-ananta-border/30 pb-1">
+                      <span className="text-xs font-semibold uppercase tracking-[0.12em] text-ananta-muted">
+                        {group.label}
+                      </span>
+                    </div>
+
+                    <ul className="space-y-2">
+                      <li className="leading-relaxed">
+                        <a
+                          href={newestItem?.target_url ?? "#"}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="text-sm text-ananta-link underline decoration-dotted underline-offset-2 hover:text-ananta-accent"
+                        >
+                          {newestItem ? `${getUpdateStateLabel(newestItem.check_type)}: ${newestItem.title}` : "更新情報"}
+                        </a>
+                      </li>
+                    </ul>
+                  </div>
+                )
+              })}
+
+              <div className="border-t border-ananta-border/50 pt-3 text-right">
+                <Link
+                  href="/updates"
+                  className="inline-flex items-center text-sm font-medium text-ananta-link underline-offset-2 hover:underline"
+                >
+                  更新履歴を一覧で見る
+                </Link>
+              </div>
+            </div>
+          )}
+        </section>
+      </div>
     </SiteShell>
   )
 }
