@@ -27,8 +27,12 @@ export async function getUpdateLogById(id: string) {
 }
 
 export async function getUpdateLogListByType(type: string) {
+  // updateslog には `type` 列がないため、一覧取得はそのまま全件を返す。
+  // 既存の呼び出し側が `type` を渡しているが、DB には対応列がないため、
+  // ここで簡易的に未使用扱いにしてビルドと表示を安定させる。
+  void type;
+
   return await actions.list({
-    filters: {type: type},
     page: 1,
     pageSize: 20,
     sort: "created_at",

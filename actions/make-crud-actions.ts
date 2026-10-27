@@ -236,8 +236,9 @@ export function makeCrudActions<T extends Record<string, any>>(
         (typeof error?.message === "string" && /duplicate key|unique constraint/i.test(error.message));
 
       if (isUniqueViolation) {
-        const e = new Error("slug_conflict");
-        (e as any).detail = error.message;
+        const e = new Error("slug_conflict") as Error & { code?: string; detail?: string };
+        e.code = "23505";
+        e.detail = error.message;
         throw e;
       }
 

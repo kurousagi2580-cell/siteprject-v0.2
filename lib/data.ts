@@ -298,23 +298,6 @@ export const enemies: Enemy[] = [
   { id: "enemy-6", name: "量子祠の守護者", attr: "光", lv: 45, iconUrl: "" },
 ]
 
-// Character skill placeholder data
-export type Skill = { label: string; name: string; description: string }
-export const characterSkills: Skill[] = [
-  { label: "通常攻撃", name: "桜花連��", description: "敵単体に物理ダメージ×3" },
-  { label: "スキル1", name: "炎舞", description: "範囲内の敵全体に火属性ダメージ（CT: 8秒）" },
-  { label: "スキル2", name: "月華斬", description: "敵単体に超高倍率ダメージ＋防御デバフ（CT: 15秒）" },
-  { label: "奥義", name: "天照紅蓮", description: "全体に大ダメージ＋味方全体にバフ" },
-]
-
-export type StatusRow = { lv: number; hp: number; atk: number; def: number; spd: number; attr: string }
-export const characterStatus: StatusRow[] = [
-  { lv: 25, hp: 3000, atk: 800, def: 400, spd: 100, attr: "火" },
-  { lv: 50, hp: 3500, atk: 900, def: 450, spd: 110, attr: "火" },
-  { lv: 75, hp: 4000, atk: 1000, def: 500, spd: 120, attr: "火" },
-  { lv: 100, hp: 4500, atk: 1100, def: 550, spd: 130, attr: "火" },
-]
-
 // Map detail placeholder data
 export type EnemyRow = { name: string; lv: number; attr: string; weak: string; drop: string }
 export const mapEnemies: EnemyRow[] = [

@@ -1,4 +1,5 @@
 
+import type { Metadata } from "next"
 import { notFound } from "next/navigation"
 import { AppImage } from "@/components/app-image"
 import { SiteShell } from "@/components/layout/site-shell"
@@ -8,6 +9,29 @@ import { UpdateLogSection } from "@/components/update-log-section"
 import RegionGrid from "@/components/region/region-grid"
 import { getCountryJoinRegion } from "@/lib/supabase/queries/contries"
 import { getUpdateLogListByType } from "@/actions/updatelogs-actions-server"
+import { resolveImageSrc, stripHtmlToPlainText } from "@/lib/utils/image-url"
+
+export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
+  const { slug } = await params
+  const country = await getCountryJoinRegion(slug)
+
+  if (!country) {
+    return { title: "国" }
+  }
+
+  const descriptionText = stripHtmlToPlainText(country.description ?? "")
+  const description = descriptionText.length > 120 ? `${descriptionText.slice(0, 117).trimEnd()}...` : descriptionText
+
+  return {
+    title: country.name,
+    description,
+    openGraph: {
+      title: country.name,
+      description,
+      images: country.image_url ? [resolveImageSrc(country.image_url) ?? ""] : undefined,
+    },
+  }
+}
 
 export default async function RegionListPage({
   params,

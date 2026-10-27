@@ -29,7 +29,7 @@ function getUpdateStateLabel(checkType: string) {
   }
 }
 
-function groupRecentUpdates(items: UpdateLog[]) {
+function groupRecentUpdates(items: UpdateLog[]): RecentUpdateGroup[] {
   const groups = new Map<string, RecentUpdateGroup>()
   const now = Date.now()
 
@@ -40,9 +40,9 @@ function groupRecentUpdates(items: UpdateLog[]) {
     const url = item.target_url || "未設定"
     const dateKey = createdAt.toISOString().slice(0, 10)
     const hourKey = String(createdAt.getHours()).padStart(2, "0")
-    const bucketKey = within24Hours ? `${dateKey}-${hourKey}-${url}` : url
+    const bucketKey = within24Hours ? `${dateKey}-${hourKey}-${url}` : `${dateKey}-${url}`
 
-    const existing = groups.get(bucketKey) ?? {
+    const existing: RecentUpdateGroup = groups.get(bucketKey) ?? {
       label: within24Hours
         ? `${createdAt.getFullYear()}/${String(createdAt.getMonth() + 1).padStart(2, "0")}/${String(createdAt.getDate()).padStart(2, "0")} ${hourKey}時`
         : `${createdAt.getFullYear()}/${String(createdAt.getMonth() + 1).padStart(2, "0")}/${String(createdAt.getDate()).padStart(2, "0")}`,
@@ -53,14 +53,18 @@ function groupRecentUpdates(items: UpdateLog[]) {
     groups.set(bucketKey, existing)
   }
 
-  return Array.from(groups.values()).map((group) => ({
-    ...group,
-    items: [...group.items].sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime()),
-  })).sort((a, b) => {
-    const aTime = new Date(a.items[0]?.created_at ?? 0).getTime()
-    const bTime = new Date(b.items[0]?.created_at ?? 0).getTime()
-    return bTime - aTime
-  })
+  return Array.from(groups.values())
+    .map((group) => ({
+      label: group.label,
+      items: [...group.items].sort(
+        (a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime(),
+      ),
+    }))
+    .sort((a, b) => {
+      const aTime = new Date(a.items[0]?.created_at ?? 0).getTime()
+      const bTime = new Date(b.items[0]?.created_at ?? 0).getTime()
+      return bTime - aTime
+    })
 }
 
 export default async function TopPage() {
@@ -159,8 +163,7 @@ export default async function TopPage() {
           ) : (
             <div className="space-y-4">
               {recentUpdateGroups.map((group) => {
-                const firstItem = group.items[0]
-                const newestItem = firstItem ?? group.items[0]
+                const newestItem = group.items[0]
 
                 return (
                   <div

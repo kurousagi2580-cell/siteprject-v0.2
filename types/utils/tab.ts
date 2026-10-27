@@ -1,6 +1,6 @@
 // src/types/tab.ts
-export type SearchTabKey = "all" | "characters" | "affiliations" | "countries" | "regions" | "events";
+export type SearchTabKey = "all" | "characters" | "affiliations" | "countries" | "regions" | "events" | "words";
 
 export function isSearchTabKey(v: unknown): v is SearchTabKey {
-  return typeof v === "string" && ["all","characters","affiliations","countries","regions","events"].includes(v);
+  return typeof v === "string" && ["all","characters","affiliations","countries","regions","events","words"].includes(v);
 }

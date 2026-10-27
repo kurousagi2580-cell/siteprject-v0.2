@@ -1,12 +1,5 @@
 export type NavItem = { label: string; href: string }
 
-export const headerNav = [
-  { label: "EXPLORE", href: "/" },
-  { label: "DISCOVER", href: "/discover" },
-  { label: "WORLD", href: "/world" },
-  { label: "DATABASE", href: "/database" },
-]
-
 export type SidebarNavItem = {
   label: string
   children: {

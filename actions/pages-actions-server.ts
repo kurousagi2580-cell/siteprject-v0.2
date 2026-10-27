@@ -30,6 +30,17 @@ export async function getPageBySlug(slug: string) {
   return await actions.getBySlug(slug);
 }
 
+export async function getPageByResource(resourceType: string, resourceId: string) {
+  return await actions.list({
+    filters: { resource_type: resourceType, resource_id: resourceId },
+    page: 1,
+    pageSize: 1,
+    includeCount: false,
+    sort: "updated_at",
+    order: "desc",
+  }).then((result) => result.items[0] ?? null);
+}
+
 export async function getPageList() {
   return await actions.list();
 }

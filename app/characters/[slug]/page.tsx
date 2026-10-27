@@ -1,17 +1,42 @@
 
+import type { Metadata } from "next"
 import { notFound } from "next/navigation"
 import { SiteShell } from "@/components/layout/site-shell"
 import CommentSection from "@/components/section/comment-section"
-import { getPageBySlug } from "@/actions/pages-actions-server"
+import { getPageByResource, getPageBySlug } from "@/actions/pages-actions-server"
 import { getArticleListByPage } from "@/actions/articles-actions-server"
-import { getCharacterDetail } from "@/lib/supabase/queries/characters"
+import { getCharacterDetail, getCharacterSkills, getCharacterStats } from "@/lib/supabase/queries/characters"
 import { mergeRelations } from "@/lib/characters/merge-character-relation"
 import { ProfileSection } from "@/components/section/profile-section"
 import { SkillsSection } from "@/components/section/skills-section"
+import { StatsSection } from "@/components/section/stats-section"
 import { RelationsSection } from "@/components/section/relations-section"
 import { RelatedArticlesSection } from "@/components/section/related-articles-section"
 import { unstable_rethrow } from "next/navigation"
 import Link from "next/link"
+import { resolveImageSrc, stripHtmlToPlainText } from "@/lib/utils/image-url"
+
+export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
+  const { slug } = await params
+  const character = await getCharacterDetail(slug)
+
+  if (!character) {
+    return { title: "キャラクター" }
+  }
+
+  const descriptionText = stripHtmlToPlainText(character.description ?? "") || `${character.name}のキャラクター詳細ページです。`
+  const description = descriptionText.length > 120 ? `${descriptionText.slice(0, 117).trimEnd()}...` : descriptionText
+
+  return {
+    title: character.name,
+    description,
+    openGraph: {
+      title: character.name,
+      description,
+      images: character.image_url ? [resolveImageSrc(character.image_url) ?? ""] : undefined,
+    },
+  }
+}
 
 export default async function CharacterDetailPage({
   params,
@@ -21,26 +46,36 @@ export default async function CharacterDetailPage({
   const { slug } = await params
 
   try {
-    const [page, character] = await Promise.all([
-      getPageBySlug(slug),
+    const [character, pageFallback, maybePage] = await Promise.all([
       getCharacterDetail(slug),
+      getPageBySlug(slug),
+      Promise.resolve(null),
     ])
 
-    if (!page) notFound()
+    if (!character) {
+      notFound()
+    }
 
-    const relatedArticle = (await getArticleListByPage(page.id)).items
+    const pageByResource = await getPageByResource("characters", character.id)
+    const page = pageByResource ?? pageFallback
 
-    if (!character || null) notFound()
+    const [relatedArticle, skills, stats] = await Promise.all([
+      page ? getArticleListByPage(page.id).then((result) => result.items) : Promise.resolve([]),
+      getCharacterSkills(character.id),
+      getCharacterStats(character.id),
+    ])
 
     const relations = mergeRelations(character)
-    const showSkills = character.type !== "NPC" && character.type !== "調査中"
+    const showSkills = skills.length > 0
+    const showStats = stats.length > 0
 
     const pageNavItems = [
       { label: "基本情報", href: "#overview" },
       ...(showSkills ? [{ label: "スキル", href: "#skills" }] : []),
+      ...(showStats ? [{ label: "ステータス", href: "#stats" }] : []),
       { label: "関連人物", href: "#relations" },
-      { label: "関連記事", href: "#related-articles" },
-      { label: "コメント", href: "#comments" },
+      ...(relatedArticle.length > 0 ? [{ label: "関連記事", href: "#related-articles" }] : []),
+      ...(page ? [{ label: "コメント", href: "#comments" }] : []),
     ]
 
     return (
@@ -70,16 +105,19 @@ export default async function CharacterDetailPage({
         </nav>
 
         <ProfileSection character={character} />
-        {showSkills && <SkillsSection />}
+        {showSkills && <SkillsSection skills={skills} />}
+        {showStats && <StatsSection stats={stats} />}
         <RelationsSection relations={relations} slug={slug} />
-        <RelatedArticlesSection articles={relatedArticle} entitySlug={slug} entityType="characters" />
-        <CommentSection pageId={page.id} />
+        {relatedArticle.length > 0 && (
+          <RelatedArticlesSection articles={relatedArticle} entitySlug={slug} entityType="characters" />
+        )}
+        {page && <CommentSection pageId={page.id} />}
 
       </SiteShell>
     )
   } catch (err) {
-    unstable_rethrow(err)          // notFound / redirect は再 throw
+    unstable_rethrow(err)
     console.error("CharacterDetailPage DB error:", err)
-    throw err                      // app/error.tsx に任せる
+    throw err
   }
 }

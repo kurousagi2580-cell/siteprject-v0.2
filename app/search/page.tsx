@@ -24,6 +24,7 @@ export default async function SearchPage({ searchParams }: Props) {
     countries: res.countries ?? [],
     regions: res.regions ?? [],
     events: res.events ?? [],
+    words: res.words ?? [],
     totals: res.totals,
   };
 
@@ -44,6 +45,7 @@ export default async function SearchPage({ searchParams }: Props) {
           countryResults={pageData.countries}
           regionResults={pageData.regions}
           eventResults={pageData.events}
+          wordResults={pageData.words}
         />
       </Section>
     </SiteShell>

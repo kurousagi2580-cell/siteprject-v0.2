@@ -17,18 +17,19 @@ import type { Affiliation } from "@/types/affiliation";
 import type { Country } from "@/types/country";
 import type { Region } from "@/types/region";
 import type { GameEvent } from "@/types/gameevents";
+import type { Word } from "@/types/word";
 
 type Props = {
   initialTab?: SearchTabKey;
   initialQuery?: string;
   initialPage?: number;
   PAGE_SIZE: number;
-  // 変更: db* ではなく server で絞り込んだ結果を受け取る
-  characterResults: Character[];
-  affiliationResults: Affiliation[];
-  countryResults: Country[];
-  regionResults: Region[];
-  eventResults: GameEvent[];
+  characterResults: any[];
+  affiliationResults: any[];
+  countryResults: any[];
+  regionResults: any[];
+  eventResults: any[];
+  wordResults: any[];
 };
 
 export default function SearchPageClient({
@@ -41,6 +42,7 @@ export default function SearchPageClient({
   countryResults,
   regionResults,
   eventResults,
+  wordResults,
 }: Props) {
   // hooks に置き換え
   const { tab, setTab } = useTab(initialTab);
@@ -76,6 +78,10 @@ export default function SearchPageClient({
     () => filterByKeyword(eventResults, keywordFromParams, (e) => e.title),
     [eventResults, keywordFromParams]
   );
+  const wordFiltered = useMemo(
+    () => filterByKeyword(wordResults, keywordFromParams, (w) => w.keyword ?? w.slug ?? ""),
+    [wordResults, keywordFromParams]
+  );
 
   const goToPage = (p: number) => goTo(p);
 
@@ -101,6 +107,7 @@ export default function SearchPageClient({
         countryResults={countryFiltered}
         regionResults={regionFiltered}
         eventResults={eventFiltered}
+        wordResults={wordFiltered}
       />
     </>
   );

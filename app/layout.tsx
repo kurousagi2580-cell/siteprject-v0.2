@@ -1,11 +1,13 @@
 import { Analytics } from '@vercel/analytics/next'
 import type { Metadata, Viewport } from 'next'
 import { AppImage } from '@/components/app-image'
+import { getSiteUrl } from '@/lib/utils/image-url'
 import './globals.css'
 
 export const revalidate = 60
 
 export const metadata: Metadata = {
+  metadataBase: new URL(getSiteUrl()),
   title: {
     default: 'Ananta Database',
     template: '%s | Ananta Database',

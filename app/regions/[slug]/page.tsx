@@ -1,3 +1,4 @@
+import type { Metadata } from "next"
 import Link from "next/link"
 import { notFound } from "next/navigation"
 import { AppImage } from "@/components/app-image"
@@ -10,10 +11,32 @@ import { GameSectionTitle } from "@/components/ui/game-section-title"
 import { Section } from "@/components/ui/section"
 import { getPageBySlug } from "@/actions/pages-actions-server"
 import { getRegionBySlug } from "@/lib/supabase/queries/regions"
-
+import { resolveImageSrc, stripHtmlToPlainText } from "@/lib/utils/image-url"
 
 // ローカルデータ（変更しない）
 import { mapEnemies, mapDrops, mapRoute, pages } from "@/lib/data"
+
+export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
+  const { slug } = await params
+  const region = await getRegionBySlug(slug)
+
+  if (!region) {
+    return { title: "地域" }
+  }
+
+  const descriptionText = stripHtmlToPlainText(region.description ?? "")
+  const description = descriptionText.length > 120 ? `${descriptionText.slice(0, 117).trimEnd()}...` : descriptionText
+
+  return {
+    title: region.name,
+    description,
+    openGraph: {
+      title: region.name,
+      description,
+      images: region.image_url ? [resolveImageSrc(region.image_url) ?? ""] : undefined,
+    },
+  }
+}
 
 export default async function MapDetailPage({
   params,

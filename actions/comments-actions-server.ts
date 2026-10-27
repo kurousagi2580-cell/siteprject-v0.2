@@ -9,9 +9,31 @@ const view_actions = makeCrudActions<CommentView>("comments_view", "page_id"); /
 export async function createCommentFromObject(payload: Record<string, any>) {
   // 必要なサーバー側バリデーションをここで行う
   if (!payload.page_id) return { success: false, error: "page_id required" };
-  const created = await actions.create(payload);
-  const { ip: _ip, ...publicComment } = created;
-  return { success: true, id: created.id, item: publicComment };
+
+  const maxAttempts = 3;
+  let lastError: any = null;
+
+  for (let attempt = 0; attempt < maxAttempts; attempt += 1) {
+    try {
+      const created = await actions.create(payload);
+      const { ip: _ip, ...publicComment } = created;
+      return { success: true, id: created.id, item: publicComment };
+    } catch (error: any) {
+      lastError = error;
+      const errorCode = error?.code ?? error?.cause?.code ?? error?.original?.code;
+      if (errorCode !== "23505" || attempt >= maxAttempts - 1) {
+        break;
+      }
+    }
+  }
+
+  if (lastError && ((lastError as any).code === "23505" || (lastError as any).message === "comment_conflict")) {
+    const conflictError = new Error("comment_conflict") as Error & { code?: string };
+    conflictError.code = "23505";
+    throw conflictError;
+  }
+
+  return { success: false, error: lastError?.message ?? "failed_to_create" };
 }
 
 export async function updateCommentFromObject(id: string, payload: Record<string, any>) {

@@ -12,7 +12,7 @@ type SearchTabsProps = {
 };
 
 export function SearchTabs({ tab, setTab, goToPage }: SearchTabsProps) {
-  const tabs: string[] = ["all", "characters", "affiliations", "countries", "regions", "events"];
+  const tabs: string[] = ["all", "characters", "affiliations", "countries", "regions", "events", "words"];
   const router = useRouter();
   const params = useSearchParams();
 
@@ -59,6 +59,7 @@ export function SearchTabs({ tab, setTab, goToPage }: SearchTabsProps) {
             {cat === "countries" && "国"}
             {cat === "regions" && "地域"}
             {cat === "events" && "イベント"}
+            {cat === "words" && "用語"}
           </button>
         ))}
       </div>

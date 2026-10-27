@@ -35,6 +35,8 @@ export function ExternalLink({ url, children }: { url: string; children: ReactNo
     <>
       <a
         href={safeUrl ?? "#"}
+        target={safeUrl ? "_blank" : undefined}
+        rel={safeUrl ? "noopener noreferrer" : undefined}
         onClick={handleClick}
         className="text-ananta-link underline"
       >

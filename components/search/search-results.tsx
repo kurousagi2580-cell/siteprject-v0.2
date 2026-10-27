@@ -12,6 +12,7 @@ import type { Affiliation } from "@/types/affiliation"
 import type { Country } from "@/types/country"
 import type { Region } from "@/types/region"
 import type { GameEvent } from "@/types/gameevents"
+import type { Word } from "@/types/word"
 
 type SearchSection = {
     title: string
@@ -25,11 +26,12 @@ type SearchResultsProps = {
     PAGE_SIZE: number
     keyword: string
     goToPage: (page: number) => void
-    characterResults: Character[]
-    affiliationResults: Affiliation[]
-    countryResults: Country[]
-    regionResults: Region[]
-    eventResults: GameEvent[]
+    characterResults: any[]
+    affiliationResults: any[]
+    countryResults: any[]
+    regionResults: any[]
+    eventResults: any[]
+    wordResults: any[]
 }
 
 export function SearchResults({
@@ -43,6 +45,7 @@ export function SearchResults({
     countryResults,
     regionResults,
     eventResults,
+    wordResults,
 }: SearchResultsProps) {
     const sections: SearchSection[] = [
         {
@@ -149,6 +152,25 @@ export function SearchResults({
                 </LinkCardBox>
             ),
         },
+        {
+            title: "用語", results: wordResults, renderItem: (a: Word) => (
+                <LinkCardBox
+                    key={a.id}
+                    href={a.slug ? `/words/${a.slug}` : "#"}
+                    className="w-full hover:opacity-90"
+                >
+                    <AppImage
+                        src={a.image_url || "/placeholder.png"}
+                        alt={a.keyword ?? "用語"}
+                        width={400}
+                        height={300}
+                        sizes="(max-width: 768px) 50vw, 25vw"
+                        className="w-full aspect-[4/3] object-cover rounded-sm"
+                    />
+                    <p className="mt-2 text-center text-sm">{a.keyword ?? a.slug ?? "用語"}</p>
+                </LinkCardBox>
+            ),
+        },
     ]
 
     const panels = {
@@ -157,6 +179,7 @@ export function SearchResults({
         countries: { title: "国検索結果", results: countryResults, renderItem: sections[2].renderItem },
         regions: { title: "地域検索結果", results: regionResults, renderItem: sections[3].renderItem },
         events: { title: "イベント検索結果", results: eventResults, renderItem: sections[4].renderItem },
+        words: { title: "用語検索結果", results: wordResults, renderItem: sections[5].renderItem },
     }
 
     if (tab === "all") {

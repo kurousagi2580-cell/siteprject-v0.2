@@ -67,6 +67,12 @@ export async function POST(req: Request) {
 
     return NextResponse.json({ ok: true, id: res.id, item: res.item });
   } catch (err: any) {
+    const errorCode = err?.code ?? err?.cause?.code ?? err?.original?.code;
+
+    if (errorCode === "23505" || err?.message === "comment_conflict") {
+      return NextResponse.json({ error: "comment_conflict" }, { status: 503 });
+    }
+
     console.error("API comments POST error", err);
     return NextResponse.json({ error: "server_error" }, { status: 500 });
   }
